@@ -1,0 +1,3 @@
+[submodule "fw/Control_Device_Electral_Method/firmware/firmware/tests/vendor/unity"]
+	path = fw/Control_Device_Electral_Method/firmware/firmware/tests/vendor/unity
+	url = https://github.com/ThrowTheSwitch/Unity
