@@ -1,7 +1,7 @@
 # Control-Device-Electral-Method
 # Arquitetura do Firmware — Caracterizador Térmico (STM32F407VET6)
 
-Autor do hardware: Kauê Lucas (diagrama "Thermal Hardware Architecture", 08/10/2026).
+referências: Kauê Lucas (diagrama "Thermal Hardware Architecture", 08/10/2026).
 Base teórica: Sofia, *Fundamentals of Thermal Resistance Measurement* (1995), método elétrico (Vf como TSP).
 
 ## 1. Princípios
