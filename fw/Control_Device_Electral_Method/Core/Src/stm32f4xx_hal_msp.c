@@ -20,6 +20,7 @@
 /* Includes ------------------------------------------------------------------*/
 #include "main.h"
 /* USER CODE BEGIN Includes */
+#include "pinout.h"
 
 /* USER CODE END Includes */
 
@@ -398,6 +399,12 @@ void HAL_TIM_Encoder_MspInit(TIM_HandleTypeDef* htim_encoder)
     HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 
     /* USER CODE BEGIN TIM2_MspInit 1 */
+    /* Mechanical encoder contacts close to GND; keep disconnected inputs defined. */
+    GPIO_InitStruct.Pull = BOARD_ENCODER_PULLUPS_ENABLED ? GPIO_PULLUP : GPIO_NOPULL;
+    GPIO_InitStruct.Pin = PIN_ENC_A;
+    HAL_GPIO_Init(PIN_ENC_A_PORT, &GPIO_InitStruct);
+    GPIO_InitStruct.Pin = PIN_ENC_B;
+    HAL_GPIO_Init(PIN_ENC_B_PORT, &GPIO_InitStruct);
 
     /* USER CODE END TIM2_MspInit 1 */
 

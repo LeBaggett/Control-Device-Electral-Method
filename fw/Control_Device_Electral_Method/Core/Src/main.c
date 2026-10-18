@@ -353,11 +353,11 @@ static void MX_TIM2_Init(void)
   sConfig.IC1Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC1Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC1Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC1Filter = 0;
+  sConfig.IC1Filter = 15;
   sConfig.IC2Polarity = TIM_ICPOLARITY_RISING;
   sConfig.IC2Selection = TIM_ICSELECTION_DIRECTTI;
   sConfig.IC2Prescaler = TIM_ICPSC_DIV1;
-  sConfig.IC2Filter = 0;
+  sConfig.IC2Filter = 15;
   if (HAL_TIM_Encoder_Init(&htim2, &sConfig) != HAL_OK)
   {
     Error_Handler();
@@ -384,7 +384,8 @@ static void MX_GPIO_Init(void)
   GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
   /* Preload safe levels before CubeMX configures output direction. */
-  __HAL_RCC_GPIOE_CLK_ENABLE();
+  PIN_SELECT_CLOCK_ENABLE();
+  PIN_RELAY_CLOCK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   board_force_safe();
 /* USER CODE END MX_GPIO_Init_1 */
@@ -419,12 +420,15 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
   HAL_GPIO_Init(MAX31855_CS_GPIO_Port, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : Relay_Pin SELECT_Pin */
-  GPIO_InitStruct.Pin = Relay_Pin|SELECT_Pin;
+  /*Configure relay separately: SELECT has its own internal pull-down. */
+  GPIO_InitStruct.Pin = Relay_Pin;
   GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   GPIO_InitStruct.Speed = GPIO_SPEED_FREQ_LOW;
-  HAL_GPIO_Init(GPIOE, &GPIO_InitStruct);
+  HAL_GPIO_Init(Relay_GPIO_Port, &GPIO_InitStruct);
+  GPIO_InitStruct.Pin = SELECT_Pin;
+  GPIO_InitStruct.Pull = PIN_SELECT_PULL;
+  HAL_GPIO_Init(SELECT_GPIO_Port, &GPIO_InitStruct);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 

@@ -3,11 +3,13 @@
 #include <string.h>
 #include "board.h"
 #include "pinout.h"
+#include "runtime_config.h"
 #include "power.h"
 #include "dwt_us.h"
-GPIO_TypeDef gpio_a = {0}, gpio_e = {4};
+GPIO_TypeDef gpio_a = {0}, gpio_e = {.id=4}, gpio_d = {.id=3};
 SPI_HandleTypeDef hspi1;
 static unsigned relay, select_level, cs, clocks, transfers, gpio_inits;
+static unsigned relay_waits;
 static uint32_t now, pclk = 84000000U;
 static bool timing_ok = true, init_ok = true;
 static HAL_StatusTypeDef io_status = HAL_OK;
@@ -18,10 +20,10 @@ void HAL_Init(void) { record('H'); }
 void HAL_GPIO_WritePin(GPIO_TypeDef *port, uint16_t pin, GPIO_PinState level)
 {
     assert(clocks & (1U << port->id));
-    if (port == GPIOE && pin == PIN_SELECT) { select_level = level; }
-    if (port == GPIOE && pin == PIN_RELAY) {
+    if (port == PIN_SELECT_PORT && pin == PIN_SELECT) { select_level = level; }
+    if (port == PIN_RELAY_PORT && pin == PIN_RELAY) {
         assert(select_level == PIN_SELECT_MEAS);
-        assert(level == PIN_RELAY_OFF); relay = level;
+        assert(BOARD_POWER_CONTROL_ENABLED || level == PIN_RELAY_OFF); relay = level;
     }
     if (port == GPIOA && pin == PIN_TC_CS) cs = level;
 }
@@ -34,6 +36,7 @@ void HAL_GPIO_Init(GPIO_TypeDef *port, GPIO_InitTypeDef *io)
 void board_cube_clock_init(void) { record('C'); }
 void board_cube_gpio_init(void) { record('G'); }
 void board_cube_peripherals_init(void) { record('P'); }
+void HAL_Delay(uint32_t ms) { assert(ms==100U && ms==THERMAL_RELAY_SETTLE_MS); assert(relay==1 && select_level==PIN_SELECT_MEAS); now+=ms;relay_waits++; }
 uint32_t HAL_GetTick(void) { return now; }
 uint32_t HAL_RCC_GetPCLK2Freq(void) { return pclk; }
 bool DWT_US_Init(void) { record('D'); return init_ok; }
@@ -55,6 +58,27 @@ int main(void)
     /* HAL prescaler encoding 32 -> BR4 -> /32 -> 2.625 MHz. */
     board_init(); assert(board_is_ready());
     assert(strcmp(order, "HSCGDP") == 0);
+    assert(board_power_control_enabled() == (BOARD_POWER_CONTROL_ENABLED != 0));
+    assert(relay == 0 && select_level == 1); /* Never auto-start at boot. */
+    power_init();
+    assert(!power_select_heating());
+    assert(!board_power_select_heating()); /* Direct API also refuses without relay. */
+#if BOARD_POWER_CONTROL_ENABLED
+    assert(power_enable_measurement() && power_relay_on());
+    assert(relay == 1 && select_level == 1 && relay_waits==1);
+    assert(power_relay_on() && relay_waits==1); /* No delay when already closed. */
+    assert(power_select_heating() && select_level == 0);
+    /* Cannot re-enable relay while SELECT is in heating; force safe instead. */
+    assert(!board_power_relay_on() && relay == 0 && select_level == 1);
+    power_safe();
+    assert(power_relay_on() && power_select_heating());
+    assert(power_enable_measurement() && relay == 1 && select_level == 1);
+    power_safe(); assert(relay == 0 && power_is_safe());
+#else
+    assert(!power_relay_on() && relay == 0 && select_level == 1);
+    assert(!power_select_heating() && power_is_safe());
+#endif
+    assert(relay_waits==(BOARD_POWER_CONTROL_ENABLED?2U:0U));
     uint32_t raw = 123;
     now = 199; assert(!board_max31855_read32(&raw) && raw == 0 && transfers == 0);
     now = 200; assert(board_max31855_read32(&raw) && raw == 0x01901230U && cs == 1);
@@ -63,8 +87,14 @@ int main(void)
     assert(!board_max31855_read32(&raw) && raw == 0 && cs == 1 && relay == 0);
     now = 400; io_status = HAL_OK; pclk = 168000000U;
     assert(!board_max31855_read32(&raw) && transfers == 2); /* >5 MHz */
-    pclk = 84000000U; timing_ok = false;
+    pclk = 84000000U;
+#if BOARD_POWER_CONTROL_ENABLED
+    assert(power_relay_on() && power_select_heating());
+    assert(relay == 1 && select_level == 0);
+#endif
+    timing_ok = false;
     assert(!board_max31855_read32(&raw) && !board_is_ready() && cs == 1);
+    assert(relay == 0 && select_level == 1); /* Failure withdraws power in both builds. */
     power_init(); assert(!power_relay_on() && power_is_safe());
     assert(!power_select_heating() && !board_power_relay_on());
     assert(!board_power_select_heating() && relay == 0 && select_level == 1);

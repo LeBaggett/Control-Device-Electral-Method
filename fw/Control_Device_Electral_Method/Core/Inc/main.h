@@ -61,10 +61,10 @@ void Error_Handler(void);
 #define SW_GPIO_Port GPIOE
 #define MAX31855_CS_Pin GPIO_PIN_4
 #define MAX31855_CS_GPIO_Port GPIOA
-#define Relay_Pin GPIO_PIN_0
-#define Relay_GPIO_Port GPIOE
-#define SELECT_Pin GPIO_PIN_1
-#define SELECT_GPIO_Port GPIOE
+#define Relay_Pin GPIO_PIN_14
+#define Relay_GPIO_Port GPIOD
+#define SELECT_Pin GPIO_PIN_12
+#define SELECT_GPIO_Port GPIOD
 
 /* USER CODE BEGIN Private defines */
 

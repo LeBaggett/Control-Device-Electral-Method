@@ -6,13 +6,42 @@
  */
 #include "stm32f4xx_hal.h"
 
-/* Segurança: PE0=RELAY_EN ativo alto; PE1=CUR_SEL alto=medição. */
-#define PIN_RELAY_PORT GPIOE
-#define PIN_RELAY       GPIO_PIN_0
-#define PIN_SELECT_PORT GPIOE
-#define PIN_SELECT       GPIO_PIN_1
+#include "peripheral_io.h"
+/* Display selection: change this one definition, then Clean + Build.
+ * SSD1306: 0.96-inch 128x64 tested by owner; SH1106: 1.3-inch 128x64.
+ * Controller identity/resolution matter, not physical size alone. */
+#ifndef OLED_SELECTED_DRIVER
+#define OLED_SELECTED_DRIVER OLED_DRIVER_SSD1306
+#endif
+#define OLED_SH1106_COLUMN_OFFSET 2U
+#if OLED_SELECTED_DRIVER != OLED_DRIVER_SSD1306 && OLED_SELECTED_DRIVER != OLED_DRIVER_SH1106
+#error "Select OLED_DRIVER_SSD1306 or OLED_DRIVER_SH1106"
+#endif
+#if OLED_SH1106_COLUMN_OFFSET > 4U
+#error "SH1106 offset must fit its 132-column RAM"
+#endif
+
+
+/* 0: relé OFF e SELECT em medição; recusa energização/aquecimento.
+ * 1: permite os comandos após board_init e na ordem segura.
+ * Alterar somente após testes e recompilar; não energiza no boot. */
+#ifndef BOARD_POWER_CONTROL_ENABLED
+#define BOARD_POWER_CONTROL_ENABLED 1
+#endif
+#if BOARD_POWER_CONTROL_ENABLED != 0 && BOARD_POWER_CONTROL_ENABLED != 1
+#error "BOARD_POWER_CONTROL_ENABLED must be 0 or 1"
+#endif
+
+/* Segurança: PD14=RELAY_EN ativo alto; PD12=CUR_SEL alto=medição. */
+#define PIN_RELAY_PORT GPIOD
+#define PIN_RELAY       GPIO_PIN_14
+#define PIN_SELECT_PORT GPIOD
+#define PIN_SELECT       GPIO_PIN_12
+#define PIN_RELAY_CLOCK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
+#define PIN_SELECT_CLOCK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
 #define PIN_RELAY_OFF    GPIO_PIN_RESET
 #define PIN_RELAY_ON     GPIO_PIN_SET
+#define PIN_SELECT_PULL GPIO_PULLDOWN /* Internal bias only; initial ODR remains measurement HIGH. */
 #define PIN_SELECT_MEAS GPIO_PIN_SET
 #define PIN_SELECT_HEAT GPIO_PIN_RESET
 
@@ -38,6 +67,8 @@
 #define PIN_OLED_SDA_PORT GPIOB
 #define PIN_OLED_SDA GPIO_PIN_9
 #define OLED_I2C_ADDRESS_7BIT 0x3CU
+
+#define BOARD_ENCODER_PULLUPS_ENABLED 1
 
 /* Encoder: revised PCB layout authorized by owner: PA15/PB3, TIM2. */
 #define PIN_ENC_A_PORT GPIOA

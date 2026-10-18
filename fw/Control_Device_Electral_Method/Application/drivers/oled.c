@@ -1,4 +1,5 @@
 #include "oled.h"
+#include "board.h"
 #include "runtime_config.h"
 #include "peripheral_io.h"
 #include <string.h>
@@ -6,7 +7,9 @@ _Static_assert(THERMAL_OLED_WIDTH == OLED_WIDTH && THERMAL_OLED_HEIGHT == OLED_H
                "These profiles only implement 128x64");
 static uint8_t frame[1024], pending[1024];
 static bool ready, busy, address_needed, display_on;
-static unsigned page, column;
+static unsigned page, column, retries;
+static uint32_t retry_ms;
+static void oled_try_init(void);
 /* Original compact 5x7 uppercase glyph table; lowercase maps to uppercase. */
 static const char chars[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-.:/%+!?=>";
 static const uint8_t font[][5] = {
@@ -105,7 +108,7 @@ void oled_service(void)
     if (!busy) {
         if (!display_on) {
             const uint8_t on[] = {0, 0xAF};
-            if (!board_oled_write(on, sizeof(on))) { ready = false; return; }
+            if (!board_oled_write(on, sizeof(on))) { ready = false; retry_ms = board_millis(); return; }
             display_on = true;
         }
         return;
@@ -114,8 +117,7 @@ void oled_service(void)
     size_t length;
     if (address_needed) {
         message[0] = 0; message[1] = (uint8_t)(0xB0U + page);
-        unsigned offset = THERMAL_OLED_CONTROLLER == THERMAL_OLED_SH1106 ?
-                          THERMAL_OLED_COLUMN_OFFSET : 0;
+        unsigned offset = board_oled_column_offset();
         message[2] = (uint8_t)(offset & 15U);
         message[3] = (uint8_t)(0x10U | (offset >> 4)); length = 4;
     } else {
@@ -123,7 +125,7 @@ void oled_service(void)
         memcpy(message+1, pending + page*128U + column, 16);
         length = 17;
     }
-    if (!board_oled_write(message, length)) { ready = busy = false; return; }
+    if (!board_oled_write(message, length)) { ready = busy = false; retry_ms = board_millis(); return; }
     if (address_needed) { address_needed = false; return; }
     column += 16;
     if (column == 128) {
@@ -131,24 +133,49 @@ void oled_service(void)
         if (++page == 8) busy = false;
     }
 }
-void oled_init(void)
+static void oled_try_init(void)
 {
     ready = busy = display_on = false; oled_clear();
     if (!THERMAL_OLED_CONFIRMED) return;
-    /* Internal DC/DC profile; external module reset must be complete. */
-#if THERMAL_OLED_CONTROLLER == THERMAL_OLED_SH1106
-    static const uint8_t init[] = {0x00,0xAE,0xD5,0x80,0xA8,0x3F,
+    if (!board_oled_prepare()) return;
+    /* SSD1306 electrical settings matched to supplied 0.96-inch example.
+     * Use documented PAGE addressing 0x02 (not the example's 0x10 parameter).
+     * SH1106 uses its own DC/DC command and RAM column offset.
+     * Each command/parameter is sent separately like the supplied example. */
+    static const uint8_t ssd1306[] = {0xAE,0x20,0x02,0xB0,0xC8,0x00,0x10,
+        0x40,0x81,0xFF,0xA1,0xA6,0xA8,0x3F,0xA4,0xD3,0x00,0xD5,0xF0,
+        0xD9,0x22,0xDA,0x12,0xDB,0x20,0x8D,0x14,0x2E};
+    static const uint8_t sh1106[] = {0xAE,0xD5,0x80,0xA8,0x3F,
         0xD3,0x00,0x40,0xAD,0x8B,0xA1,0xC8,0xDA,0x12,
         0x81,0x7F,0xD9,0x22,0xDB,0x35,0xA4,0xA6};
-#elif THERMAL_OLED_CONTROLLER == THERMAL_OLED_SSD1306
-    static const uint8_t init[] = {0x00,0xAE,0xD5,0x80,0xA8,0x3F,
-        0xD3,0x00,0x40,0x8D,0x14,0x20,0x02,0xA1,0xC8,0xDA,0x12,
-        0x81,0x7F,0xD9,0xF1,0xDB,0x40,0xA4,0xA6,0x2E};
-#else
-#error "Unsupported OLED controller"
-#endif
-    if (!board_oled_write(init, sizeof(init))) return;
+    const uint8_t *commands;
+    size_t count;
+    uint8_t controller = board_oled_controller();
+    if (controller == OLED_DRIVER_SSD1306) {
+        commands = ssd1306; count = sizeof(ssd1306);
+    } else if (controller == OLED_DRIVER_SH1106) {
+        commands = sh1106; count = sizeof(sh1106);
+    } else return;
+    for (size_t i=0;i<count;++i) {
+        const uint8_t command[] = {0,commands[i]};
+        if (!board_oled_write(command,sizeof(command))) return;
+    }
     /* Clear display RAM before display-on to avoid random splash pixels. */
     ready = true;
     (void)oled_present();
+}
+
+void oled_init(void)
+{
+    retries = 0;
+    oled_try_init();
+    retry_ms = board_millis();
+}
+
+/* May block during power-up settling; call only while no thermal job is active. */
+void oled_recover_service(void)
+{
+    if (!ready && retries < 3U && (uint32_t)(board_millis()-retry_ms) >= 1000U) {
+        retries++; oled_try_init(); retry_ms = board_millis();
+    }
 }

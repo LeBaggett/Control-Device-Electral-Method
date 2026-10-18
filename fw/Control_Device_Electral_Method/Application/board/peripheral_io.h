@@ -3,6 +3,11 @@
 #include <stdbool.h>
 #include <stddef.h>
 #include <stdint.h>
+#define OLED_DRIVER_SSD1306 1U
+#define OLED_DRIVER_SH1106 2U
+uint8_t board_oled_controller(void);
+uint8_t board_oled_column_offset(void);
+bool board_oled_prepare(void);
 bool board_oled_write(const uint8_t *bytes, size_t count);
 bool board_encoder_start(uint32_t *counter);
 uint32_t board_encoder_counter(void);

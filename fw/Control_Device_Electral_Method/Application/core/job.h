@@ -31,6 +31,12 @@ typedef enum {
     JOB_ERROR_POWER_LOCKED = 11
 } job_error_t;
 
+typedef struct {
+ bool enabled, reference_valid;
+ float slope_c_per_v, reference_c, reference_vf, last_tj_c;
+} manual_k_debug_t;
+extern volatile manual_k_debug_t g_manual_k_debug;
+bool job_start_test_manual_k(float start_c,float end_c,float step_c,float slope_c_per_v,float reference_c);
 void job_init(void);
 bool job_start_calibration(void);
 bool job_start_calibration_params(float start_c, float end_c, float step_c);

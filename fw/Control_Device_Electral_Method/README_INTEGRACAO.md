@@ -34,7 +34,9 @@ exclusão de conteúdo do disco antes de importar o projeto reorganizado.
 - Reserva mínima de stack elevada de 1 KiB para 8 KiB; heap 512 B.
   Stack real e tempos de pior caso ainda exigem observação no alvo.
 - Não há DMA configurado neste projeto; o wrapper não chama MX_DMA_Init.
-- As chamadas para energizar relé ou selecionar heating permanecem recusadas.
+- A flag BOARD_POWER_CONTROL_ENABLED em Application/board/pinout.h começa
+  em 0 e recusa relé ON/heating. Em 1 permite a sequência com intertravamento;
+  não liga no boot. Veja Application/docs/CONTROLE_POTENCIA.md.
 
 ## Evidência
 

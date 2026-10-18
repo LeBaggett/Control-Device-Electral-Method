@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "job.h"
+#include "hw_debug.h"
 #include "board.h"
 #include "power.h"
 #include "vf_adc.h"
@@ -35,8 +36,9 @@ bool vf_adc_take_samples(float *value)
 }
 bool vf_adc_capture(unsigned count,float *value)
 {
-    assert(count==8); assert(measuring); record('V');
-    *value=sample_ok?0.6f:NAN; return sample_ok;
+    assert(count==(job_kind()==JOB_KIND_CALIBRATION?CAL_VF_SAMPLES:TEST_VF_SAMPLES));
+    assert(measuring); record('V');
+    *value=sample_ok?(job_kind()==JOB_KIND_CALIBRATION?(constant_vf?0.6f:(279-temperature)/357):0.6f):NAN; return sample_ok;
 }
 bool sdlog_ready(void) { return storage; }
 bool sdlog_open_run(bool cal) { (void)cal; record('O'); return storage; }
@@ -79,9 +81,9 @@ int main(void)
     assert(job_error()==JOB_ERROR_POWER_LOCKED && !relay && closes==1);
     reset(); assert(job_start_calibration_params(30,50,10));
     assert(strstr(trace,"OMR") && !strchr(trace,'H'));
-    d=(device_t){0}; tick(&d,30);
-    for(int i=0;i<10;i++) tick(&d,30);
-    assert(!strchr(trace,'A')); /* No early sample before 2s soak. */
+    d=(device_t){0}; tick(&d,29.75f); assert(!strchr(trace,'V'));
+    tick(&d,30); assert(strstr(trace,"MDV") && writes==0);
+    assert(!strchr(trace,'A')); /* Immediate synchronous capture, no soak/request. */
     assert(run_follow(&d)==JOB_STATUS_COMPLETED && writes==3 && saved==1 && closes==1);
     assert(calibration.valid && calibration.n==3 && fabsf(calibration.m+357)<0.2f && !relay);
     reset(); constant_vf=true; assert(job_start_calibration_params(30,50,10));
@@ -106,9 +108,21 @@ int main(void)
     now=TEST_TARGET_TIMEOUT_S*1000U;
     assert(job_step(&d)==JOB_STATUS_FAILED && job_error()==JOB_ERROR_TARGET_TIMEOUT);
     reset(); write_fail_after=0; assert(job_start_test(30,50,10)); d=(device_t){0};
-    tick(&d,30); tick(&d,30);
+    tick(&d,30);
     assert(tick(&d,30)==JOB_STATUS_FAILED && job_error()==JOB_ERROR_STORAGE && !relay);
     reset(); sample_ok=false; assert(job_start_test(30,50,10)); d=(device_t){0};
     tick(&d,30); assert(tick(&d,30)==JOB_STATUS_FAILED && !relay && !strstr(trace,"VH"));
-    puts("calibration, heating protocol and safe exits: PASS"); return 0;
+    reset(); assert(job_start_calibration_params(30,31,0.5f));d=(device_t){0};
+    tick(&d,30.25f);assert(strstr(trace,"MDV") && writes==0);
+    tick(&d,30.25f);assert(writes==1);
+    size_t before=trace_n;assert(job_step(&d)==JOB_STATUS_RUNNING && trace_n==before);
+    tick(&d,30.75f);tick(&d,30.75f);assert(writes==2);
+    tick(&d,31.25f);assert(tick(&d,31.25f)==JOB_STATUS_COMPLETED && writes==3 && saved==1);
+    reset();sample_ok=false;assert(job_start_calibration_params(30,31,0.5f));d=(device_t){0};
+    assert(tick(&d,30)==JOB_STATUS_FAILED && job_error()==JOB_ERROR_SAMPLE_FAILED && !relay);
+    reset();assert(job_start_test(30,50,10));d=(device_t){0};
+    g_hw_debug.tc_valid=true;g_hw_debug.tc_raw_c=161;
+    assert(tick(&d,150)==JOB_STATUS_FAILED && job_error()==JOB_ERROR_OVERTEMP && !relay);
+    g_hw_debug.tc_valid=false;
+    puts("Immediate calibration/test capture, small steps and safe exits: PASS"); return 0;
 }

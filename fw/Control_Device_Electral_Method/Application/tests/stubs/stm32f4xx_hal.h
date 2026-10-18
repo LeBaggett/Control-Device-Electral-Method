@@ -2,24 +2,36 @@
 #ifndef MOCK_HAL_H
 #define MOCK_HAL_H
 #include <stdint.h>
-typedef struct { unsigned id; } GPIO_TypeDef;
+typedef struct { unsigned id; uint32_t IDR, ODR; } GPIO_TypeDef;
 extern GPIO_TypeDef gpio_a, gpio_e;
 #define GPIOA (&gpio_a)
 #define GPIOE (&gpio_e)
+extern GPIO_TypeDef gpio_b, gpio_c, gpio_d;
+#define GPIOB (&gpio_b)
+#define GPIOC (&gpio_c)
+#define GPIOD (&gpio_d)
 #define GPIO_PIN_0 1U
+#define GPIO_PIN_14 16384U
+#define GPIO_PIN_12 4096U
 #define GPIO_PIN_1 2U
 #define GPIO_PIN_4 16U
 #define GPIO_PIN_5 32U
 #define GPIO_PIN_6 64U
 #define GPIO_PIN_7 128U
 #define GPIO_PIN_2 4U
+#define GPIO_PIN_3 8U
+#define GPIO_PIN_8 256U
+#define GPIO_PIN_9 512U
+#define GPIO_PIN_15 32768U
 #define ADC_CHANNEL_10 10U
 typedef enum { GPIO_PIN_RESET, GPIO_PIN_SET } GPIO_PinState;
 typedef struct { uint32_t Pin, Mode, Pull, Speed; } GPIO_InitTypeDef;
 #define GPIO_MODE_OUTPUT_PP 1U
 #define GPIO_NOPULL 0U
+#define GPIO_PULLDOWN 2U
 #define GPIO_SPEED_FREQ_LOW 0U
 void mock_clock(unsigned id);
+#define __HAL_RCC_GPIOD_CLK_ENABLE() mock_clock(3)
 #define __HAL_RCC_GPIOE_CLK_ENABLE() mock_clock(4)
 #define __HAL_RCC_GPIOA_CLK_ENABLE() mock_clock(0)
 void HAL_GPIO_WritePin(GPIO_TypeDef*, uint16_t, GPIO_PinState);
@@ -68,7 +80,10 @@ typedef struct {
     uint32_t Resolution, DataAlign, ScanConvMode, NbrOfConversion,
              ContinuousConvMode, ExternalTrigConvEdge, EOCSelection, ClockPrescaler;
 } ADC_InitTypeDef;
-typedef struct { void *Instance; ADC_InitTypeDef Init; } ADC_HandleTypeDef;
+typedef struct { volatile uint32_t SR,CR2,DR; } ADC_TypeDef;
+typedef struct { ADC_TypeDef *Instance; ADC_InitTypeDef Init; } ADC_HandleTypeDef;
+#define ADC_SR_EOC (1U << 1)
+#define ADC_CR2_SWSTART (1U << 30)
 typedef struct { uint32_t Channel, Rank, SamplingTime; } ADC_ChannelConfTypeDef;
 typedef struct { uint32_t CCR; } ADC_Common_TypeDef;
 extern ADC_Common_TypeDef mock_adc_common;
@@ -85,6 +100,8 @@ extern ADC_Common_TypeDef mock_adc_common;
 #define ADC_SAMPLETIME_15CYCLES 15U
 #define ENABLE 1U
 #define DISABLE 0U
+void HAL_Delay(uint32_t);
+HAL_StatusTypeDef HAL_I2C_IsDeviceReady(I2C_HandleTypeDef*,uint16_t,uint32_t,uint32_t);
 HAL_StatusTypeDef HAL_I2C_Master_Transmit(I2C_HandleTypeDef*,uint16_t,uint8_t*,uint16_t,uint32_t);
 HAL_StatusTypeDef HAL_TIM_Encoder_Start(TIM_HandleTypeDef*,uint32_t);
 GPIO_PinState HAL_GPIO_ReadPin(GPIO_TypeDef*,uint16_t);
@@ -96,7 +113,7 @@ uint32_t HAL_ADC_GetValue(ADC_HandleTypeDef*);
 typedef struct {
     uint32_t ClockEdge,ClockBypass,ClockPowerSave,BusWide,HardwareFlowControl,ClockDiv;
 } SD_InitTypeDef;
-typedef struct { void *Instance; SD_InitTypeDef Init; } SD_HandleTypeDef;
+typedef struct { void *Instance; SD_InitTypeDef Init; uint32_t ErrorCode; struct { uint32_t CardType, LogBlockNbr; } SdCard; } SD_HandleTypeDef;
 #define SDIO ((void*)4)
 #define SDIO_CLOCK_EDGE_RISING 0U
 #define SDIO_CLOCK_BYPASS_DISABLE 0U

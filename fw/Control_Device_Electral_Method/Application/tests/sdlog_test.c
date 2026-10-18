@@ -69,6 +69,21 @@ int main(void)
     cal.t0=280;assert(sdlog_save_calibration(&cal));
     int current=find("0:/CALIB.TXT");assert(current>=0);files[current].content[14]^=1;
     assert(sdlog_load_calibration(&loaded) && loaded.t0==279); /* CRC fallback backup. */
+    tc_cal_params_t tc={1.02f,-0.5f,0.25f,1,3},tc_loaded;
+    assert(sdlog_save_tc_calibration(&tc) && sdlog_load_tc_calibration(&tc_loaded));
+    assert(fabsf(tc_loaded.gain-1.02f)<0.00001f && tc_loaded.offset==-0.5f);
+    assert(tc_calibration_set(&tc));assert(!sdlog_load_calibration(&loaded));
+    assert(sdlog_save_calibration(&cal) && sdlog_load_calibration(&loaded));
+    tc.alpha=0.5f;assert(tc_calibration_set(&tc));assert(sdlog_load_calibration(&loaded));
+    tc.offset=1;assert(sdlog_save_tc_calibration(&tc));
+    int tc_file=find("0:/TCAL.TXT");assert(tc_file>=0);files[tc_file].content[10]^=1;
+    assert(sdlog_load_tc_calibration(&tc_loaded) && tc_loaded.offset==-0.5f);
+    assert(sdlog_open_run(false));assert(!sdlog_save_tc_calibration(&tc));assert(sdlog_close());
+    assert(sdlog_reset_tc_calibration());
+    assert(sdlog_load_tc_calibration(&tc_loaded) && tc_loaded.gain==1 && tc_loaded.offset==0 && tc_loaded.points==0);
+    tc_file=find("0:/TCAL.TXT");files[tc_file].content[10]^=1;
+    assert(sdlog_load_tc_calibration(&tc_loaded) && tc_loaded.gain==1 && tc_loaded.offset==0 && tc_loaded.points==0);
+    tc.gain=-1;assert(!sdlog_save_tc_calibration(&tc));
     short_write=true;assert(sdlog_open_run(false)==false && !sdlog_ready());
     short_write=false;sdlog_init();assert(sdlog_open_run(false));
     card=false;assert(!sdlog_line("test") && !sdlog_ready());

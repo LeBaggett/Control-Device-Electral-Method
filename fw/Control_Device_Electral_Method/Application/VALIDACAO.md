@@ -11,7 +11,7 @@ Doze executáveis de teste compilados e executados com sucesso no computador com
 | board | Ordem segura, latches antecipados, leitura SPI/timeout, erro DWT e bloqueio fixo |
 | dwt | Guardas de clock/limite/contador parado com CMSIS simulado |
 | math | Alvos, coeficientes m≈−357 e T0≈279, R², degeneração, Vf/VDDA, formatação e CRC |
-| ui | SH1106 pages, snapshot de frame, cada pixel da logo, menu e encoder/debounce/wrap |
+| ui | SSD1306/SH1106 pages, snapshot de frame, cada pixel da logo, menu e encoder/debounce/wrap |
 | adc | Média, captura, VREFINT, fallback, rail e falha de conversão |
 | sdlog | FatFs simulado habilitado, nomes sem sobrescrever, sync, CRC/backup, escrita curta/remoção |
 | sd_board | SD ausente não causa trap; seleção do bus e verificação periódica |

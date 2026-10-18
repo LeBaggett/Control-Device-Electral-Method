@@ -12,6 +12,7 @@ bool board_power_select_heating(void);
 void board_power_relay_off(void);
 bool board_power_relay_on(void);
 bool board_is_ready(void);
+bool board_power_control_enabled(void);
 void board_force_safe(void);
 /* SPI configurado MODE 0, 8 bits, CS ativo baixo; 4 bytes MSB primeiro. */
 bool board_max31855_read32(uint32_t *raw);

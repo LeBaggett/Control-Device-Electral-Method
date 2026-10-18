@@ -1,6 +1,13 @@
 #ifndef VF_ADC_H
 #define VF_ADC_H
 #include <stdbool.h>
+#include <stdint.h>
+typedef struct {
+ uint32_t capture_attempts,capture_status,burst_status,requested_samples,completed_samples;
+ uint32_t last_vf_raw,last_burst_raw,elapsed_cycles,reference_age_ms;
+ float last_voltage;
+} vf_adc_debug_t;
+extern volatile vf_adc_debug_t g_vf_debug;
 
 void vf_adc_init(void);
 bool vf_adc_read_voltage(float *voltage);

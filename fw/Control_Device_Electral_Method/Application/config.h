@@ -13,6 +13,7 @@
 #ifndef TARGETS_MAX
 #define TARGETS_MAX 200U
 #endif
+/* Legacy tolerance/soak values retained for compatibility; immediate capture does not use them. */
 #ifndef CAL_TOL_C
 #define CAL_TOL_C 0.5f
 #endif
@@ -21,6 +22,9 @@
 #endif
 #ifndef CAL_WAIT_TIMEOUT_S
 #define CAL_WAIT_TIMEOUT_S 3600U
+#endif
+#ifndef CAL_MEAS_DELAY_US
+#define CAL_MEAS_DELAY_US 30U
 #endif
 #ifndef CAL_VF_SAMPLES
 #define CAL_VF_SAMPLES 64U

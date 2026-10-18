@@ -22,6 +22,7 @@ void oled_bitmap(int x, int y, unsigned width, unsigned height,
 bool oled_present(void);
 /* One small I2C transaction per call, maximum HAL timeout 5 ms. */
 void oled_service(void);
+void oled_recover_service(void); /* Idle/startup only; can block. */
 bool oled_busy(void);
 const uint8_t *oled_framebuffer(void);
 

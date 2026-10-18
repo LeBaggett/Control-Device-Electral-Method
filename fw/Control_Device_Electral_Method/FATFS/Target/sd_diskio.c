@@ -82,6 +82,9 @@ const Diskio_drvTypeDef  SD_Driver =
 };
 
 /* USER CODE BEGIN beforeFunctionSection */
+/* Polling transfers must not hold up startup/UI for the template's 30 seconds. */
+#undef SD_TIMEOUT
+#define SD_TIMEOUT 1000U
 /* can be used to modify / undefine following code or add new code */
 /* USER CODE END beforeFunctionSection */
 

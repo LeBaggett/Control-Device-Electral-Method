@@ -1,5 +1,6 @@
 #include "board.h"
 #include "pinout.h"
+#include "runtime_config.h"
 #include "dwt_us.h"
 #include <stddef.h>
 
@@ -9,15 +10,19 @@ extern void board_cube_gpio_init(void);
 extern void board_cube_peripherals_init(void);
 extern SPI_HandleTypeDef hspi1;
 static bool s_board_ready;
+static bool s_relay_commanded_on;
+static bool s_select_measurement;
 static uint32_t s_last_tc_ms, s_tc_interval_ms;
 
 void board_power_select_measurement(void)
 {
     HAL_GPIO_WritePin(PIN_SELECT_PORT, PIN_SELECT, PIN_SELECT_MEAS);
+    s_select_measurement = true;
 }
 void board_power_relay_off(void)
 {
     HAL_GPIO_WritePin(PIN_RELAY_PORT, PIN_RELAY, PIN_RELAY_OFF);
+    s_relay_commanded_on = false;
 }
 void board_force_safe(void)
 {
@@ -28,26 +33,45 @@ void board_force_safe(void)
 }
 bool board_power_select_heating(void)
 {
+    if (BOARD_POWER_CONTROL_ENABLED && s_board_ready && s_relay_commanded_on) {
+        HAL_GPIO_WritePin(PIN_SELECT_PORT, PIN_SELECT, PIN_SELECT_HEAT);
+        s_select_measurement = false;
+        return true;
+    }
     board_force_safe();
-    return false; /* Stage 6 integration lock, no heater operation. */
+    return false;
 }
 bool board_power_relay_on(void)
 {
+    if (BOARD_POWER_CONTROL_ENABLED && s_board_ready && s_select_measurement) {
+        if (!s_relay_commanded_on) {
+            HAL_GPIO_WritePin(PIN_RELAY_PORT, PIN_RELAY, PIN_RELAY_ON);
+            /* SELECT stays in measurement throughout mechanical closure.
+             * ADC capture/heating callers proceed only after this returns. */
+            HAL_Delay(THERMAL_RELAY_SETTLE_MS);
+        }
+        s_relay_commanded_on = true;
+        return true;
+    }
     board_force_safe();
-    return false; /* Readiness is NOT permission to energize. */
+    return false;
 }
+bool board_power_control_enabled(void) { return BOARD_POWER_CONTROL_ENABLED != 0; }
 static void board_safe_gpio_early(void)
 {
     GPIO_InitTypeDef io = {0};
-    __HAL_RCC_GPIOE_CLK_ENABLE();
+    PIN_SELECT_CLOCK_ENABLE();
+    PIN_RELAY_CLOCK_ENABLE();
     PIN_TC_CS_CLOCK_ENABLE();
     board_force_safe(); /* Preload output latches BEFORE output mode. */
     io.Mode = GPIO_MODE_OUTPUT_PP;
     io.Pull = GPIO_NOPULL;
     io.Speed = GPIO_SPEED_FREQ_LOW;
     io.Pin = PIN_SELECT;
+    io.Pull = PIN_SELECT_PULL;
     HAL_GPIO_Init(PIN_SELECT_PORT, &io);
     io.Pin = PIN_RELAY;
+    io.Pull = GPIO_NOPULL;
     HAL_GPIO_Init(PIN_RELAY_PORT, &io);
     io.Pin = PIN_TC_CS;
     HAL_GPIO_Init(PIN_TC_CS_PORT, &io);

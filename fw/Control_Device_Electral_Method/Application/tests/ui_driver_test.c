@@ -3,12 +3,19 @@
 #include <string.h>
 #include <math.h>
 #include "oled.h"
+#include "hw_debug.h"
 #include "ui.h"
 #include "encoder.h"
 #include "peripheral_io.h"
 #include "config.h"
 #include "logo.h"
 #include "runtime_config.h"
+#ifndef TEST_OLED_CONTROLLER
+#define TEST_OLED_CONTROLLER OLED_DRIVER_SSD1306
+#endif
+bool board_oled_prepare(void) { return true; }
+uint8_t board_oled_controller(void) { return TEST_OLED_CONTROLLER; }
+uint8_t board_oled_column_offset(void) { return TEST_OLED_CONTROLLER==OLED_DRIVER_SH1106?2:0; }
 static uint32_t now, counter;
 static bool pressed, bus_ok = true;
 static unsigned transactions, pages, bytes;
@@ -38,7 +45,7 @@ bool board_oled_write(const uint8_t *p,size_t n)
     transactions++;
     if (n == 4 && p[0] == 0) {
         assert((p[1]&0xF8U)==0xB0 && p[2]==
-            (THERMAL_OLED_CONTROLLER==THERMAL_OLED_SH1106?2:0) && p[3]==0x10);
+            board_oled_column_offset() && p[3]==0x10);
         destination=(p[1]&7U)*128U; pages++;
     } else if (n == 17 && p[0] == 0x40) {
         assert(destination+16 <= sizeof(displayed));
@@ -91,7 +98,22 @@ int main(int argc,char **argv)
     d.mode=DEVICE_RESULT; d.calibration_valid=1;d.calibration=(cal_params_t){-357,279,1,3,true};
     event(&d,INPUT_EVENT_NONE);save_screen("result",&d);
     while(oled_busy()) { oled_service(); }
+    d.mode=DEVICE_STANDBY;d.tc_gain=1;d.tc_required=4;
+    ui_init();event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    assert(ui_current_screen()==UI_SCREEN_TC_CAL);save_screen("tc_menu",&d);
+    event(&d,INPUT_EVENT_CW);cmd=event(&d,INPUT_EVENT_CLICK);
+    assert(cmd.type==UI_CMD_TC_BEGIN && cmd.tc_points==4);save_screen("tc_points",&d);
+    assert(event(&d,INPUT_EVENT_LONG).type==UI_CMD_TC_CANCEL);
+    event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    assert(ui_current_screen()==UI_SCREEN_TC_FINE);save_screen("tc_fine",&d);
+    event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);cmd=event(&d,INPUT_EVENT_CLICK);
+    assert(cmd.type==UI_CMD_TC_SAVE && fabsf(cmd.tc_offset-0.1f)<0.001f);
+    while(oled_busy()) {oled_service();}
     bus_ok=false; assert(oled_present()); oled_service(); assert(!oled_ready());
+    g_hw_tuning.encoder_direction=1;
     counter=UINT32_MAX-1; encoder_init(); counter=2;
     assert(encoder_get_event()==INPUT_EVENT_CW);
     counter=UINT32_MAX-1; assert(encoder_get_event()==INPUT_EVENT_CCW);
@@ -104,5 +126,28 @@ int main(int argc,char **argv)
     assert(encoder_get_event()==INPUT_EVENT_NONE);
     pressed=false; encoder_get_event(); now+=30;
     assert(encoder_get_event()==INPUT_EVENT_NONE); /* No click after long press. */
-    puts("OLED, logo, menu and encoder: PASS"); return 0;
+    d=(device_t){0};ui_init();event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CLICK);
+    for(unsigned i=0;i<3;i++)event(&d,INPUT_EVENT_CW);
+    event(&d,INPUT_EVENT_CLICK);assert(ui_current_screen()==UI_SCREEN_K_MANUAL);
+    save_screen("manual_k",&d);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    assert(ui_current_screen()==UI_SCREEN_K_MANUAL); /* Must explicitly review K. */
+    event(&d,INPUT_EVENT_CCW);event(&d,INPUT_EVENT_CCW);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CCW);event(&d,INPUT_EVENT_CLICK); /* -510 C/V, commit. */
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    assert(ui_current_screen()==UI_SCREEN_SETUP);
+    for(unsigned i=0;i<3;i++)event(&d,INPUT_EVENT_CW);
+    event(&d,INPUT_EVENT_CLICK);save_screen("confirm_manual_k",&d);
+    cmd=event(&d,INPUT_EVENT_CLICK);assert(cmd.type==UI_CMD_START_TEST_K&&cmd.manual_k_c_per_v==-510);
+    d=(device_t){0};ui_init();event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CLICK);
+    assert(ui_current_screen()==UI_SCREEN_TC_HEAT_SETUP);save_screen("tc_heat_setup",&d);
+    event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);event(&d,INPUT_EVENT_CW);
+    cmd=event(&d,INPUT_EVENT_CLICK);assert(cmd.type==UI_CMD_TC_HEAT_BEGIN && cmd.tc_points==3 && cmd.start_temperature_c==30 && cmd.step_temperature_c==10);
+    d.tc_heat_active=true;d.tc_heat_target_c=30;d.tc_required=3;save_screen("tc_heating",&d);
+    d.tc_heat_stable=true;save_screen("tc_heat_ready",&d);
+    d.tc_heat_error=2;save_screen("tc_heat_failure",&d);
+    assert(event(&d,INPUT_EVENT_LONG).type==UI_CMD_TC_CANCEL);
+    puts("OLED, logo, menus, signed manual K review,  encoder: PASS"); return 0;
 }

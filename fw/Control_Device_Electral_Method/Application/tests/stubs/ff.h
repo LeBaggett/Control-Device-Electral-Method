@@ -4,7 +4,7 @@
 typedef unsigned UINT;
 typedef unsigned char BYTE;
 typedef int FRESULT;
-typedef struct { int reserved; } FATFS;
+typedef struct { int reserved; unsigned fs_type; } FATFS;
 typedef struct { int index; size_t pos; } FIL;
 #define FR_OK 0
 #define FR_EXIST 1

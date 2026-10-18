@@ -33,6 +33,7 @@
 /* USER CODE END FirstSection */
 /* Includes ------------------------------------------------------------------*/
 #include "bsp_driver_sd.h"
+#include "sd_io.h"
 
 /* Extern variables ---------------------------------------------------------*/
 
@@ -106,10 +107,34 @@ __weak uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t Nu
 {
   uint8_t sd_state = MSD_OK;
 
-  if (HAL_SD_ReadBlocks(&hsd, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout) != HAL_OK)
+  g_sd_io_debug.read_sector = ReadAddr;
+  g_sd_io_debug.read_blocks = NumOfBlocks;
+  HAL_StatusTypeDef read_result = HAL_ERROR;
+  for (unsigned attempt=0;attempt<3U;attempt++)
   {
-    sd_state = MSD_ERROR;
+    g_sd_io_debug.read_attempts++;
+    read_result = HAL_SD_ReadBlocks(&hsd, (uint8_t *)pData, ReadAddr, NumOfBlocks, Timeout);
+    uint32_t read_error=hsd.ErrorCode;
+    g_sd_io_debug.read_hal_status = read_result;
+    g_sd_io_debug.read_hal_error = read_error;
+    g_sd_io_debug.read_clkcr = hsd.Instance->CLKCR;
+    g_sd_io_debug.read_cmd = hsd.Instance->CMD;
+    g_sd_io_debug.read_response1 = hsd.Instance->RESP1;
+    if (read_result==HAL_OK) break;
+    g_sd_io_debug.last_failed_read_error=read_error;
+    if ((read_error & HAL_SD_ERROR_DATA_CRC_FAIL)!=0U) g_sd_io_debug.read_crc_failures++;
+    /* Retry only a single-sector read with a pure data CRC error. A card
+     * still transferring, or any other error, must be reported to FatFs. */
+    if (read_error!=HAL_SD_ERROR_DATA_CRC_FAIL || NumOfBlocks!=1U || attempt==2U ||
+        HAL_SD_GetCardState(&hsd)!=HAL_SD_CARD_TRANSFER) break;
+    g_sd_io_debug.read_retries++;
+    HAL_Delay(2U);
   }
+  if (read_result == HAL_OK && ReadAddr == 0U && NumOfBlocks != 0U) {
+    const uint8_t *bytes = (const uint8_t *)pData;
+    g_sd_io_debug.first_read_signature = ((uint32_t)bytes[510] << 8U) | bytes[511];
+  }
+  if (read_result != HAL_OK) sd_state = MSD_ERROR;
 
   return sd_state;
 }
@@ -214,7 +239,10 @@ __weak uint8_t BSP_SD_Erase(uint32_t StartAddr, uint32_t EndAddr)
   */
 __weak uint8_t BSP_SD_GetCardState(void)
 {
-  return ((HAL_SD_GetCardState(&hsd) == HAL_SD_CARD_TRANSFER ) ? SD_TRANSFER_OK : SD_TRANSFER_BUSY);
+  uint32_t state = HAL_SD_GetCardState(&hsd);
+  g_sd_io_debug.last_card_state = state;
+  g_sd_io_debug.card_status_hal_error = hsd.ErrorCode;
+  return state == HAL_SD_CARD_TRANSFER ? SD_TRANSFER_OK : SD_TRANSFER_BUSY;
 }
 
 /**

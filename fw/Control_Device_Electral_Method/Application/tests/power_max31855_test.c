@@ -30,3 +30,5 @@ int main(void)
     assert(fabsf(t+1.0f)<0.001f);
     puts("power + MAX31855 tests: PASS"); return 0;
 }
+
+uint32_t board_millis(void) { return 0; }

@@ -1,6 +1,12 @@
 #include "max31855.h"
+#include "hw_debug.h"
+#include <math.h>
 #include "board.h"
-void max31855_init(void) { /* Conversor somente leitura, sem registradores. */ }
+void max31855_init(void) {
+ g_hw_debug.tc_valid = false;
+ g_hw_debug.tc_raw_c = g_hw_debug.tc_internal_c = g_hw_debug.tc_display_c = NAN;
+ g_hw_debug.tc_min_c = g_hw_debug.tc_max_c = NAN;
+}
 max31855_status_t max31855_decode(uint32_t raw, float *tc, float *internal)
 {
     int32_t t14, t12;
@@ -25,8 +31,28 @@ max31855_status_t max31855_decode(uint32_t raw, float *tc, float *internal)
 }
 max31855_status_t max31855_read(float *thermocouple_c)
 {
-    uint32_t raw;
-    if (thermocouple_c == 0 || !board_max31855_read32(&raw))
-        return MAX31855_SPI_ERROR;
-    return max31855_decode(raw, thermocouple_c, 0);
+ uint32_t raw = 0;
+ float internal = NAN;
+ max31855_status_t status = MAX31855_SPI_ERROR;
+ if (thermocouple_c && board_max31855_read32(&raw))
+     status = max31855_decode(raw, thermocouple_c, &internal);
+ g_hw_debug.tc_frame = raw;
+ g_hw_debug.tc_status = status;
+ g_hw_debug.tc_samples++;
+ if (status != MAX31855_OK) {
+     g_hw_debug.tc_valid = false;
+     g_hw_debug.tc_errors++;
+     g_hw_debug.tc_raw_c = g_hw_debug.tc_internal_c = g_hw_debug.tc_display_c = NAN;
+     return status;
+ }
+ float value = *thermocouple_c;
+ float alpha = g_hw_tuning.display_filter_alpha;
+ if (!(alpha > 0.0f && alpha <= 1.0f)) alpha = 1.0f;
+ g_hw_debug.tc_display_c = !g_hw_debug.tc_valid ? value :
+     g_hw_debug.tc_display_c + alpha * (value-g_hw_debug.tc_display_c);
+ g_hw_debug.tc_raw_c = value; g_hw_debug.tc_internal_c = internal;
+ if (!isfinite(g_hw_debug.tc_min_c) || value < g_hw_debug.tc_min_c) g_hw_debug.tc_min_c = value;
+ if (!isfinite(g_hw_debug.tc_max_c) || value > g_hw_debug.tc_max_c) g_hw_debug.tc_max_c = value;
+ g_hw_debug.tc_valid = true; g_hw_debug.tc_last_ok_ms = board_millis();
+ return status; /* Control and logging still receive the unfiltered sample. */
 }

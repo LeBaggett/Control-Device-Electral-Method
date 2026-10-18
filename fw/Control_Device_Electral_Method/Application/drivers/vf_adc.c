@@ -5,6 +5,7 @@
 #include "vf_math.h"
 #include <math.h>
 #include <stdint.h>
+volatile vf_adc_debug_t g_vf_debug;
 static bool ready, valid, fallback, waiting, measuring_vref, request, completed;
 static uint32_t sum, count, wanted, sample_ms, conversion_ms, vref_ms;
 static float voltage, vdda;
@@ -62,6 +63,7 @@ void vf_adc_service(void)
         fallback = !isfinite(estimate); vdda = fallback ? VDDA_NOMINAL_V : estimate;
         measuring_vref = false; vref_ms = now; return;
     }
+    g_vf_debug.last_vf_raw=raw;
     if (raw == 0 || raw >= 4095) {
         valid = false; voltage = NAN; sum = count = 0;
         if (request) completed = true;
@@ -90,12 +92,18 @@ bool vf_adc_read_voltage(float *out)
 }
 bool vf_adc_capture(unsigned n, float *out)
 {
-    if (!out) return false;
-    *out = NAN;
-    if (!ready || request || (uint32_t)(board_millis()-vref_ms) > 1000U) return false;
-    board_adc_cancel(); waiting = false; sum = count = 0;
+    g_vf_debug.capture_attempts++;g_vf_debug.requested_samples=n;
+    g_vf_debug.last_voltage=NAN;
+    g_vf_debug.reference_age_ms=(uint32_t)(board_millis()-vref_ms);
+    if (!out) {g_vf_debug.capture_status=1;return false;}
+    *out=NAN;
+    if (!ready) {g_vf_debug.capture_status=2;return false;}
+    if (request) {g_vf_debug.capture_status=3;return false;}
+    if (g_vf_debug.reference_age_ms>1000U) {g_vf_debug.capture_status=4;return false;}
+    board_adc_cancel();waiting=false;sum=count=0;
     float raw;
-    if (!board_adc_burst(n,&raw)) { valid = false; voltage = NAN; return false; }
-    voltage = convert(raw); valid = isfinite(voltage); sample_ms = board_millis();
-    *out = voltage; return valid;
+    if (!board_adc_burst(n,&raw)) {g_vf_debug.capture_status=5;valid=false;voltage=NAN;return false;}
+    voltage=convert(raw);valid=isfinite(voltage);sample_ms=board_millis();
+    g_vf_debug.capture_status=valid?0U:6U;g_vf_debug.last_voltage=voltage;
+    *out=voltage;return valid;
 }
