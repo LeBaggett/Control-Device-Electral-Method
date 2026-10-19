@@ -589,8 +589,10 @@ HAL_StatusTypeDef HAL_SD_ReadBlocks(SD_HandleTypeDef *hsd, uint8_t *pData, uint3
 
     hsd->State = HAL_SD_STATE_BUSY;
 
-    /* Initialize data control register */
+    /* Local polling fix: discard completion/errors left by a prior transfer
+     * before enabling the new data path. Command flags are managed separately. */
     hsd->Instance->DCTRL = 0U;
+    __HAL_SD_CLEAR_FLAG(hsd, SDIO_STATIC_DATA_FLAGS);
 
     if(hsd->SdCard.CardType != CARD_SDHC_SDXC)
     {
@@ -755,11 +757,19 @@ HAL_StatusTypeDef HAL_SD_ReadBlocks(SD_HandleTypeDef *hsd, uint8_t *pData, uint3
       }
     }
 
-    /* Clear all the static flags */
+    /* HAL_OK requires the complete requested payload, not just DATAEND.
+     * Never expose an untouched/partial FatFs sector as a successful read. */
+    if (dataremaining != 0U)
+    {
+      __HAL_SD_CLEAR_FLAG(hsd, SDIO_STATIC_DATA_FLAGS);
+      hsd->ErrorCode |= HAL_SD_ERROR_DATA_TIMEOUT;
+      hsd->State = HAL_SD_STATE_READY;
+      hsd->Context = SD_CONTEXT_NONE;
+      return HAL_ERROR;
+    }
     __HAL_SD_CLEAR_FLAG(hsd, SDIO_STATIC_DATA_FLAGS);
-
     hsd->State = HAL_SD_STATE_READY;
-
+    hsd->Context = SD_CONTEXT_NONE;
     return HAL_OK;
   }
   else

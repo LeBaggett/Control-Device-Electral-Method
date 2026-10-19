@@ -31,6 +31,7 @@ typedef struct {
     uint8_t vdda_fallback;
     cal_params_t calibration;
     uint8_t calibrating;
+    uint8_t sofia_active,sofia_phase;
     uint8_t manual_k_active;
     uint8_t tc_heat_active,tc_heat_stable,tc_heat_error,tc_heat_holding,tc_heat_waiting_next;
     float tc_heat_target_c;

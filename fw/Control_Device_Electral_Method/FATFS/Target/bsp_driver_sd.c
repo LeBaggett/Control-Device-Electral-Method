@@ -130,6 +130,7 @@ __weak uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t Nu
     g_sd_io_debug.read_retries++;
     HAL_Delay(2U);
   }
+  if (read_result == HAL_OK && NumOfBlocks != 0U) sd_capture_sector(ReadAddr,(const uint8_t *)pData);
   if (read_result == HAL_OK && ReadAddr == 0U && NumOfBlocks != 0U) {
     const uint8_t *bytes = (const uint8_t *)pData;
     g_sd_io_debug.first_read_signature = ((uint32_t)bytes[510] << 8U) | bytes[511];

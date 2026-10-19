@@ -149,5 +149,14 @@ int main(int argc,char **argv)
     d.tc_heat_stable=true;save_screen("tc_heat_ready",&d);
     d.tc_heat_error=2;save_screen("tc_heat_failure",&d);
     assert(event(&d,INPUT_EVENT_LONG).type==UI_CMD_TC_CANCEL);
+    d=(device_t){0};ui_init();event(&d,INPUT_EVENT_CLICK);event(&d,INPUT_EVENT_CLICK);
+    for(unsigned i=0;i<4;i++)event(&d,INPUT_EVENT_CW);
+    event(&d,INPUT_EVENT_CLICK);assert(ui_current_screen()==UI_SCREEN_SOFIA_SETUP);save_screen("sofia_setup",&d);
+    for(unsigned i=0;i<5;i++)event(&d,INPUT_EVENT_CW);
+    event(&d,INPUT_EVENT_CLICK);assert(ui_current_screen()==UI_SCREEN_SOFIA_CONFIRM);save_screen("sofia_confirm",&d);
+    cmd=event(&d,INPUT_EVENT_CLICK);assert(cmd.type==UI_CMD_START_SOFIA && cmd.sofia.heat_s==1 && cmd.sofia.delay_us==20 && cmd.sofia.slope==-467);
+    d.mode=DEVICE_RUNNING;d.sofia_active=1;d.sofia_phase=1;event(&d,INPUT_EVENT_NONE);save_screen("sofia_heat",&d);
+    assert(event(&d,INPUT_EVENT_CLICK).type==UI_CMD_SOFIA_MEASURE);
+    d.sofia_phase=2;save_screen("sofia_cooling",&d);assert(event(&d,INPUT_EVENT_LONG).type==UI_CMD_ABORT);
     puts("OLED, logo, menus, signed manual K review,  encoder: PASS"); return 0;
 }

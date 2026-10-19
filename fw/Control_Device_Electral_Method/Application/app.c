@@ -11,6 +11,7 @@
 #include "device.h"
 #include "encoder.h"
 #include "job.h"
+#include "sofia.h"
 #include "oled.h"
 #include "power.h"
 #include "rtd.h"
@@ -144,7 +145,7 @@ static bool app_start_command(const ui_cmd_t *cmd)
     }
 
     if ((cmd->type == UI_CMD_START_CALIBRATION ||
-         cmd->type == UI_CMD_START_TEST || cmd->type == UI_CMD_START_TEST_K) &&
+         cmd->type == UI_CMD_START_TEST || cmd->type == UI_CMD_START_TEST_K || cmd->type==UI_CMD_START_SOFIA) &&
         (!s_temperature_valid || s_job_active || tc_session.collecting || g_tc_heat_debug.active ||
           s_device.temperature_c>=OVERTEMP_C || (g_hw_debug.tc_valid && g_hw_debug.tc_raw_c>=OVERTEMP_C))) {
         if (!s_job_active) {
@@ -223,13 +224,22 @@ static bool app_start_command(const ui_cmd_t *cmd)
         g_hw_debug.tc_corrected_c=NAN;g_hw_debug.tc_display_corrected_c=NAN;
         s_device.tc_adjust_status=7;return true;
     }
+    case UI_CMD_START_SOFIA:
+        if(sofia_start(&cmd->sofia,&s_device)) {
+            s_job_active=true;s_device.sofia_active=1;s_device.sofia_phase=1;
+            s_device.calibrating=0;s_device.manual_k_active=0;s_device.mode=DEVICE_RUNNING;
+            s_device.progress_percent=0;s_device.error_code=0;return true;
+        }
+        s_device.mode=DEVICE_ERROR;s_device.error_code=(int32_t)g_sofia_debug.error;power_safe();return false;
+    case UI_CMD_SOFIA_MEASURE:
+        if(s_job_active && s_device.sofia_active){sofia_measure_now();return true;}return false;
     case UI_CMD_START_CALIBRATION:
         if (job_start_calibration_params(cmd->start_temperature_c,cmd->end_temperature_c,cmd->step_temperature_c)) {
             s_job_active = true;
             s_device.mode = DEVICE_RUNNING;
             s_device.progress_percent = 0U;
             s_device.error_code = 0;
-            s_device.calibrating = 1; s_device.manual_k_active=0;
+            s_device.sofia_active=0;s_device.calibrating = 1; s_device.manual_k_active=0;
             return true;
         }
         break;
@@ -245,7 +255,7 @@ static bool app_start_command(const ui_cmd_t *cmd)
             s_device.target_temperature_c = cmd->start_temperature_c;
             s_device.progress_percent = 0U;
             s_device.error_code = 0;
-            s_device.calibrating = 0; s_device.manual_k_active=cmd->type==UI_CMD_START_TEST_K;
+            s_device.sofia_active=0;s_device.calibrating = 0; s_device.manual_k_active=cmd->type==UI_CMD_START_TEST_K;
             return true;
         }
         break;
@@ -253,7 +263,7 @@ static bool app_start_command(const ui_cmd_t *cmd)
     case UI_CMD_ABORT:
         tc_heater_stop();tc_heat_sync();
         if (s_job_active) {
-            job_abort();
+            if(s_device.sofia_active)sofia_abort();else job_abort();
             s_job_active = false;
             power_safe();
             s_device.mode = DEVICE_ABORTED;
@@ -316,7 +326,7 @@ void app_init(void)
     s_device.calibration = *calibration_get();
     s_device.calibration_valid = s_device.calibration.valid;
     s_device.storage_ready = sdlog_ready();
-    job_init();
+    job_init();sofia_init();
     ui_init();
 
     /* Estado seguro obrigatório antes de entrar no superloop. */
@@ -362,7 +372,8 @@ void app_run(void)
     (void)app_start_command(&cmd);
 
     if (s_job_active) {
-        job_status_t status = job_step(&s_device);
+        job_status_t status = s_device.sofia_active?sofia_step(&s_device):job_step(&s_device);
+        if(s_device.sofia_active){s_device.sofia_phase=(uint8_t)g_sofia_debug.phase;s_device.error_code=(int32_t)g_sofia_debug.error;}
 
         if (status == JOB_STATUS_COMPLETED) {
             s_job_active = false;

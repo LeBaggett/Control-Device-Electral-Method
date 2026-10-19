@@ -61,3 +61,7 @@ int main(void)
 void board_debug_service(void) { }
 
 bool board_sd_prepare(void) { sd_retries++; return false; }
+
+#include "sofia_io.h"
+bool sofia_io_capture(unsigned delay,sofia_capture_t *out){(void)delay;(void)out;return false;}
+uint32_t sofia_io_elapsed_us(uint32_t start){(void)start;return 0;}

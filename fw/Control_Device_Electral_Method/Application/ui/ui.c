@@ -16,6 +16,7 @@ static unsigned selected;
 static bool editing;
 static uint32_t splash_ms;
 static float start_c, end_c, step_c;
+static sofia_config_t sofia_cfg;
 static bool is_calibration, manual_k_mode, k_reviewed, k_notice;
 static float manual_k=-500.0f;
 static unsigned k_step_index;
@@ -57,6 +58,7 @@ ui_cmd_t ui_step(const device_t *d, input_event_t event)
     }
     if (screen == UI_SCREEN_RUNNING) {
         if (event == INPUT_EVENT_LONG) { cmd.type = UI_CMD_ABORT; go(UI_SCREEN_HOME); }
+        else if(event==INPUT_EVENT_CLICK && d->sofia_active)cmd.type=UI_CMD_SOFIA_MEASURE;
         return cmd;
     }
     if (event == INPUT_EVENT_LONG) {
@@ -68,9 +70,14 @@ ui_cmd_t ui_step(const device_t *d, input_event_t event)
         if (event == INPUT_EVENT_CLICK) go(UI_SCREEN_MENU);
         break;
     case UI_SCREEN_MENU:
-        if (turn) selected = rotate(selected, 5, event);
+        if (turn) selected = rotate(selected, 6, event);
         if (event == INPUT_EVENT_CLICK) {
-            if (selected == 4) go(UI_SCREEN_HOME);
+            if (selected == 5) go(UI_SCREEN_HOME);
+            else if(selected==4) {
+                sofia_cfg=(sofia_config_t){d->calibration_valid?d->calibration.m:-467.0f,
+                    d->calibration_valid?d->calibration.t0:279.36f,85,1,20};
+                go(UI_SCREEN_SOFIA_SETUP);
+            }
             else if(selected == 3) {
                 k_notice=false;manual_k_mode=false;go(UI_SCREEN_K_MANUAL);
             }
@@ -86,6 +93,29 @@ ui_cmd_t ui_step(const device_t *d, input_event_t event)
                     go(UI_SCREEN_ERROR); notice_nocal = true;
                 } else go(UI_SCREEN_SETUP);
             }
+        }
+        break;
+    case UI_SCREEN_SOFIA_SETUP:
+        if(turn && !editing)selected=rotate(selected,7,event);
+        else if(turn) {
+            float sign=event==INPUT_EVENT_CW?1.0f:-1.0f;
+            if(selected==0){int n=(int)sofia_cfg.heat_s+(int)sign;if(n>=1 && n<=600)sofia_cfg.heat_s=(unsigned)n;}
+            if(selected==1){float n=sofia_cfg.slope+sign*.1f;if(n>=-100000 && n< -1)sofia_cfg.slope=n;}
+            if(selected==2){float n=sofia_cfg.intercept+sign*.01f;if(n>=-10000 && n<=10000)sofia_cfg.intercept=n;}
+            if(selected==3){int n=(int)sofia_cfg.delay_us+(int)sign;if(n>=5 && n<=1000)sofia_cfg.delay_us=(unsigned)n;}
+            if(selected==4){float n=sofia_cfg.max_case_c+sign;if(n>=30 && n<=120)sofia_cfg.max_case_c=n;}
+        }
+        if(event==INPUT_EVENT_CLICK) {
+            if(selected<5)editing=!editing;
+            else if(selected==5)go(UI_SCREEN_SOFIA_CONFIRM);
+            else go(UI_SCREEN_MENU);
+        }
+        break;
+    case UI_SCREEN_SOFIA_CONFIRM:
+        if(turn)selected=rotate(selected,2,event);
+        if(event==INPUT_EVENT_CLICK) {
+            if(selected==1)go(UI_SCREEN_SOFIA_SETUP);
+            else {cmd.type=UI_CMD_START_SOFIA;cmd.sofia=sofia_cfg;}
         }
         break;
     case UI_SCREEN_K_MANUAL:
@@ -278,8 +308,26 @@ void ui_render(const device_t *d)
         oled_text(0,55,"CLIQUE: MENU"); break;
     case UI_SCREEN_MENU:
         title("CARACTERIZACAO");
-        choice(12,"ENSAIO",0);choice(22,"CALIBRACAO",1);
-        choice(32,"CAL TERMOPAR",2);choice(42,"ENSAIO K MANUAL",3);choice(54,"VOLTAR",4);break;
+        choice(11,"ENSAIO",0);choice(20,"CALIBRACAO",1);
+        choice(29,"CAL TERMOPAR",2);choice(38,"ENSAIO K MANUAL",3);
+        choice(47,"ENSAIO TSP",4);choice(56,"VOLTAR",5);break;
+    case UI_SCREEN_SOFIA_SETUP: {
+        title("TSP: DEGRAU POTENCIA");
+        unsigned first=selected>4?selected-4:0;
+        for(unsigned row=first;row<7 && row<first+5;row++) {
+            if(row<5) {
+                char v[18];float value=row==0?(float)sofia_cfg.heat_s:row==1?sofia_cfg.slope:row==2?sofia_cfg.intercept:row==3?(float)sofia_cfg.delay_us:sofia_cfg.max_case_c;
+                (void)format_decimal(v,sizeof(v),value,(row==1 || row==2)?2:0);
+                (void)snprintf(line,sizeof(line),"%s %.16s",row==0?"TEMPO s":row==1?"M C/V":row==2?"B C":row==3?"ATRASO us":"MAX CASE C",v);
+                choice(13+(int)(row-first)*10,line,row);
+            } else choice(13+(int)(row-first)*10,row==5?"REVISAR/INICIAR":"VOLTAR",row);
+        }
+        break;
+    }
+    case UI_SCREEN_SOFIA_CONFIRM:
+        title("CONFERIR RETA T(V)");oled_text(0,13,"Ih:758mA Im:2mA");
+        oled_text(0,24,"MAX31855 NA CASE");
+        choice(39,"INICIAR DEGRAU",0);choice(53,"VOLTAR",1);break;
     case UI_SCREEN_K_MANUAL: {
         title(k_notice?"CONFIRME VALOR K":"K ASSINADO C/V");
         char value[20];(void)format_decimal(value,sizeof(value),manual_k,1);
@@ -366,15 +414,15 @@ void ui_render(const device_t *d)
         oled_text(0,46,d->power_control_enabled?"POTENCIA HABILITADA":"POTENCIA BLOQUEADA");
         oled_text(0,56,"CLIQUE: VOLTAR"); break;
     case UI_SCREEN_RUNNING:
-        (void)snprintf(line,sizeof(line),"%s %02lu:%02lu:%02lu",d->calibrating?"CAL":d->manual_k_active?"HEAT K":"HEAT",
+        (void)snprintf(line,sizeof(line),"%s %02lu:%02lu:%02lu",d->sofia_active?(d->sofia_phase==2?"TSP RESFR":"TSP AQUEC"):d->calibrating?"CAL":d->manual_k_active?"HEAT K":"HEAT",
             (unsigned long)(d->elapsed_seconds/3600U),
             (unsigned long)((d->elapsed_seconds/60U)%60U),
             (unsigned long)(d->elapsed_seconds%60U)); title(line);
-        number(13,"T C: ",(g_hw_debug.tc_valid ? g_hw_debug.tc_display_c*d->tc_gain+d->tc_offset_c : d->temperature_c),1);
-        number(23,"ALVO: ",d->target_temperature_c,1); number(33,"VF: ",d->vf_voltage,3);
+        number(13,d->sofia_active?"CASE C: ":"T C: ",(g_hw_debug.tc_valid ? g_hw_debug.tc_display_c*d->tc_gain+d->tc_offset_c : d->temperature_c),1);
+        number(23,d->sofia_active?"LIM CASE: ":"ALVO: ",d->target_temperature_c,1); number(33,"VF: ",d->vf_voltage,3);
         unsigned progress = d->progress_percent > 100 ? 100 : d->progress_percent;
         oled_rect(0,44,128,6,false); oled_rect(1,45,(int)(126U*progress/100U),4,true);
-        oled_text(0,55,"SEGURAR: ABORTAR"); break;
+        oled_text(0,55,d->sofia_active && d->sofia_phase==1?"CLIQUE: MEDIR AGORA":"SEGURAR: ABORTAR"); break;
     case UI_SCREEN_RESULT:
         title(d->mode==DEVICE_ABORTED?"ABORTADO":"CONCLUIDO");
         if (d->mode==DEVICE_ABORTED) oled_text(0,27,"OPERACAO ABORTADA");

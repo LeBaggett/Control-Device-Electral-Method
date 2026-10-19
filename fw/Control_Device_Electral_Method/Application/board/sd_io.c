@@ -24,12 +24,19 @@ bool board_sd_is_ready(void)
 bool board_sd_prepare(void)
 {
     ready = false;
+    g_sd_io_debug.sector_trace_count = 0;
     g_hw_debug.sd_attempts++;
     g_hw_debug.sd_phase = 1U;
     g_hw_debug.sd_mount_result = -1;
     g_hw_debug.sd_bus_bits = 1U;
     g_hw_debug.sd_wide_status = 0xFFFFFFFFU;
     HAL_Delay(THERMAL_SD_POWERUP_MS);
+    /* Each explicit bench attempt starts with clean HAL/FIFO/peripheral state.
+     * Does not power-cycle the card or touch relay/SELECT GPIOs. */
+    if (hsd.Instance == SDIO) (void)HAL_SD_DeInit(&hsd);
+    __HAL_RCC_SDIO_FORCE_RESET();
+    __HAL_RCC_SDIO_RELEASE_RESET();
+    hsd = (SD_HandleTypeDef){0};
     hsd.Instance = SDIO;
     hsd.Init.ClockEdge = SDIO_CLOCK_EDGE_RISING;
     hsd.Init.ClockBypass = SDIO_CLOCK_BYPASS_DISABLE;

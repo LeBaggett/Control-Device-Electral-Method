@@ -26,7 +26,13 @@ int main(void)
     assert(!vf_adc_take_samples(&voltage));
     assert(vf_adc_capture(8,&voltage) && isfinite(voltage));
     assert(g_vf_debug.capture_status==0 && g_vf_debug.capture_attempts==1);
-    now+=1001;assert(!vf_adc_capture(8,&voltage) && g_vf_debug.capture_status==4);
+    now+=1952;assert(!vf_adc_capture(8,&voltage) && g_vf_debug.capture_status==4);
+    assert(vf_adc_refresh_reference() && g_vf_debug.reference_age_ms==0);
+    assert(vf_adc_capture(8,&voltage) && g_vf_debug.capture_status==0);
+    assert(g_vf_debug.reference_refreshes==1 && g_vf_debug.reference_status==0);
+    available=false;assert(!vf_adc_refresh_reference() && g_vf_debug.reference_status==4);
+    available=true;reference=0;assert(!vf_adc_refresh_reference() && g_vf_debug.reference_status==5);
+    reference=1500;assert(vf_adc_refresh_reference());
     assert(vf_adc_begin_samples(4));assert(!vf_adc_capture(8,&voltage) && g_vf_debug.capture_status==3);
     vf_adc_cancel_samples();
     vf=4095; service(2); assert(!vf_adc_read_voltage(&voltage));

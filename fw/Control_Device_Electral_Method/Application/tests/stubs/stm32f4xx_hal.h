@@ -2,6 +2,7 @@
 #ifndef MOCK_HAL_H
 #define MOCK_HAL_H
 #include <stdint.h>
+#include <stdbool.h>
 typedef struct { unsigned id; uint32_t IDR, ODR; } GPIO_TypeDef;
 extern GPIO_TypeDef gpio_a, gpio_e;
 #define GPIOA (&gpio_a)
@@ -122,6 +123,10 @@ typedef struct { void *Instance; SD_InitTypeDef Init; uint32_t ErrorCode; struct
 #define SDIO_BUS_WIDE_4B 4U
 #define SDIO_HARDWARE_FLOW_CONTROL_DISABLE 0U
 HAL_StatusTypeDef HAL_SD_Init(SD_HandleTypeDef*);
+HAL_StatusTypeDef HAL_SD_DeInit(SD_HandleTypeDef*);
+void mock_sd_reset(bool asserted);
+#define __HAL_RCC_SDIO_FORCE_RESET() mock_sd_reset(true)
+#define __HAL_RCC_SDIO_RELEASE_RESET() mock_sd_reset(false)
 HAL_StatusTypeDef HAL_SD_ConfigWideBusOperation(SD_HandleTypeDef*,uint32_t);
 #define HAL_SD_CARD_TRANSFER 4U
 #define HAL_SD_CARD_ERROR 255U

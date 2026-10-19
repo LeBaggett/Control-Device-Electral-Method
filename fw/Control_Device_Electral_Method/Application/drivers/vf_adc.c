@@ -33,6 +33,28 @@ void vf_adc_cancel_samples(void)
 }
 float vf_adc_vdda(void) { return vdda; }
 bool vf_adc_vdda_fallback(void) { return fallback; }
+bool vf_adc_refresh_reference(void)
+{
+    g_vf_debug.reference_refreshes++;
+    if (!ready) {g_vf_debug.reference_status=1;return false;}
+    if (request) {g_vf_debug.reference_status=2;return false;}
+    board_adc_cancel();waiting=false;sum=count=0;
+    valid=false;voltage=NAN;measuring_vref=true;
+    if (!board_adc_begin(true)) {g_vf_debug.reference_status=3;return false;}
+    uint32_t started=board_millis(),guard=100000U;
+    uint16_t raw;
+    while (!board_adc_sample(&raw)) {
+        if (--guard==0 || (uint32_t)(board_millis()-started)>=5U) {
+            board_adc_cancel();g_vf_debug.reference_status=4;return false;
+        }
+    }
+    if(raw==0 || raw>=4095) {g_vf_debug.reference_status=5;return false;}
+    float estimate=vdda_from_vrefint(reference,raw);
+    fallback=!isfinite(estimate);vdda=fallback?VDDA_NOMINAL_V:estimate;
+    vref_ms=board_millis();measuring_vref=false;
+    g_vf_debug.reference_age_ms=0;g_vf_debug.reference_status=0;
+    return true;
+}
 bool vf_adc_begin_samples(unsigned n)
 {
     if (!ready || request || n == 0 || n > 64) return false;

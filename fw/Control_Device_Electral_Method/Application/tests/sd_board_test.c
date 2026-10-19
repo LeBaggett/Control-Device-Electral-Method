@@ -8,7 +8,9 @@ SD_HandleTypeDef hsd;
 static bool card;
 static bool wide_ok=true;
 void HAL_Delay(uint32_t ms) { (void)ms; }
-static unsigned calls;
+static unsigned calls,resets,deinits;
+void mock_sd_reset(bool asserted){if(asserted)resets++;}
+HAL_StatusTypeDef HAL_SD_DeInit(SD_HandleTypeDef *s){assert(s==&hsd);deinits++;return HAL_OK;}
 static uint32_t now;
 uint32_t HAL_GetTick(void) { return now; }
 uint32_t HAL_SD_GetCardState(SD_HandleTypeDef *s)
@@ -24,6 +26,7 @@ int main(void)
 {
     assert(!board_sd_prepare() && !board_sd_is_ready() && calls==1);
     card=true;assert(board_sd_prepare() && board_sd_is_ready());
+    assert(resets==2 && deinits==1);
 #if THERMAL_SD_BUS_BITS == 4U
     assert(calls==3 && g_hw_debug.sd_bus_bits==4);
 #else

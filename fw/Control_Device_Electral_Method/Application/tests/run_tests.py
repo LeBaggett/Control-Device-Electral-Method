@@ -22,10 +22,13 @@ cases = {
     'app': ['tests/app_test.c','app.c','ui/ui.c','ui/assets.c',
         'drivers/oled.c','drivers/encoder.c','drivers/vf_adc.c','drivers/max31855.c',
         'drivers/rtd.c','drivers/power.c','drivers/sdlog.c','core/job.c',
-        'core/targets.c','core/linfit.c','core/vf_math.c','core/format.c','core/calibration.c'],
+        'core/targets.c','core/linfit.c','core/vf_math.c','core/format.c','core/calibration.c','core/sofia.c'],
     'require_cal': ['tests/require_cal_test.c','core/job.c','core/targets.c',
         'core/linfit.c','core/format.c','ui/ui.c','ui/assets.c'],
 }
+cases['tsp_slow_sd']=['tests/sofia_slow_sd_test.c','core/sofia.c','drivers/vf_adc.c','core/format.c','core/vf_math.c']
+cases['sofia']=['tests/sofia_test.c','core/sofia.c','core/format.c','core/vf_math.c']
+cases['sofia_io']=['tests/sofia_io_test.c','board/sofia_io.c']
 cases['adc_burst_adapter'] = ['tests/adc_burst_adapter_test.c']
 cases['tc_heater'] = ['tests/tc_heater_test.c']
 cases['tc_heat_app'] = ['tests/tc_heat_app_test.c','app.c','ui/ui.c','ui/assets.c','core/format.c']
@@ -43,7 +46,7 @@ with tempfile.TemporaryDirectory(prefix='thermal-tests-') as temp:
     for name in selected:
         sources = cases[name] + (['core/tc_heater.c'] if name in ('app','tc_menu_app','tc_heater','tc_heat_app') else []) + ['drivers/hw_debug.c','core/tc_calibration.c','core/thermal_tsp.c']
         cmd = common.copy()
-        if name in ('board', 'board_enabled', 'dwt', 'sdlog', 'sd_board', 'sd_board_1bit','adc_burst_adapter'):
+        if name in ('board', 'board_enabled', 'dwt', 'sdlog', 'sd_board', 'sd_board_1bit','adc_burst_adapter','sofia_io'):
             cmd += ['-I' + str(root / 'tests/stubs')]
         if name == 'adc_burst_adapter':
             adapter=(root/'board/peripheral_io.c').read_text()
@@ -86,9 +89,12 @@ with tempfile.TemporaryDirectory(prefix='thermal-tests-') as temp:
     # Real HAL adapter is compiled against the shim, never called with fake MCU addresses.
     subprocess.run(common + ['-I'+str(root/'tests/stubs'),'-c',
         str(root/'board/peripheral_io.c'),'-o',str(Path(temp)/'peripheral_io.o')],check=True)
+    subprocess.run(common + ['-I'+str(root/'tests/stubs'),'-c', str(root/'board/sofia_io.c'),'-o',str(Path(temp)/'sofia_io.o')],check=True)
     print('HAL peripheral adapter syntax: PASS',flush=True)
 print('All host checks passed. No real STM32 HAL build or hardware validation.')
 
 # Real filesystem integration: temporary images only, never physical cards.
 import sys
 subprocess.run([sys.executable,str(root/"tests/run_filesystems_test.py")],check=True)
+
+subprocess.run([sys.executable,str(root/'tests/sd_polling_complete_test.py')],check=True)
