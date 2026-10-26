@@ -1,5 +1,16 @@
 # MVP - arquitetura e escopo inicial
 
+## Estrutura inicial no repositório
+
+- Firmware novo: `fw/Control_Device_Electral_Method_MVP`, dividido em Application, Core, Drivers, Middlewares e LWIP.
+- Application mantém board, core, drivers, interfaces, ui, docs e tests como na POC.
+- Bancada separada: `fw/testbench/MVP_H753_Hardware_Bench`.
+- Web: `tools/thermal_analyzer_web`.
+- Circuito/fixture: `hardware/mvp`; projeto da IHM: `hmi/mvp`.
+- Contratos: [interfaces](interfaces/README.md); validação: [validation](validation/README.md).
+
+Esta etapa cria estrutura e orientações. Nenhum GPIO/corrente foi arbitrado e nenhum projeto CubeMX H753 foi gerado.
+
 Estado: planejamento, 26/10/2026. Desenvolvimento separado da POC consolidada. Este documento não constitui firmware H753 pronto nem circuito dimensionado.
 
 ## Definições do responsável
