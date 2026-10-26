@@ -1,0 +1,6 @@
+Version: thermal_board_v6
+Based on thermal_board_v5; original thermal_board_v4 (2).zip.
+References read only. Physical validation not performed.
+firmware-architecture.md SHA256 33644f53110252acac3a03c494607541a032a370be3acadc743f4da98657b228
+2026-10-13-firmware-caracterizacao-termica_1.md SHA256 f3abd5f35f7526af444ecf135a167b8be6250c07f2bf9b052ca9a4f2ad141429
+epd_bitmap_.bin SHA256 bcfac031e4b6ac71311a266ef90a03c0c79ef957de32c903999b1fb2c1cc0568

@@ -1,0 +1,22 @@
+# Add these files to CubeIDE alongside generated HAL, CMSIS, startup and middleware.
+# Do not compile tests/ or .example files in the target.
+app.c
+board/board.c
+board/dwt_us.c
+board/peripheral_io.c
+board/sd_io.c
+drivers/power.c
+drivers/max31855.c
+drivers/rtd.c
+drivers/vf_adc.c
+drivers/encoder.c
+drivers/oled.c
+drivers/sdlog.c
+core/job.c
+core/targets.c
+core/linfit.c
+core/vf_math.c
+core/format.c
+core/calibration.c
+ui/ui.c
+ui/assets.c

@@ -1,0 +1,12 @@
+# Local IDE state and generated outputs
+.metadata/
+**/.settings/*.sfrview.prefs
+**/Debug/
+**/Release/
+**/Build/
+**/__pycache__/
+**/.venv/
+**/__MACOSX/
+*.pyc
+tools/thermal_analyzer/demo_report/
+tools/thermal_analyzer.zip

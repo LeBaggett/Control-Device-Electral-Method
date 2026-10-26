@@ -1,0 +1,103 @@
+#include "vf_adc.h"
+#include "peripheral_io.h"
+#include "board.h"
+#include "runtime_config.h"
+#include "vf_math.h"
+#include <math.h>
+#include <stdint.h>
+static bool ready, valid, fallback, waiting, measuring_vref, request, completed;
+static uint32_t sum, count, wanted, sample_ms, conversion_ms, vref_ms;
+static float voltage, vdda;
+static uint16_t reference, last_raw;
+uint16_t vf_adc_raw_count(void) { return last_raw; }
+static float convert(float raw)
+{
+    return (vf_from_counts(raw,vdda)-THERMAL_ADC_OFFSET_V)/THERMAL_ADC_GAIN;
+}
+void vf_adc_init(void)
+{
+    ready = valid = waiting = request = completed = false;
+    sum = count = 0; wanted = THERMAL_ADC_AVERAGE_COUNT; voltage = NAN;
+    vdda = VDDA_NOMINAL_V; fallback = true; vref_ms = board_millis();
+    if (!THERMAL_ADC_CONFIRMED || !isfinite(THERMAL_ADC_GAIN) ||
+        THERMAL_ADC_GAIN <= 0 || !isfinite(THERMAL_ADC_OFFSET_V)) return;
+    reference = board_vrefint_calibration();
+    ready = board_adc_start(); measuring_vref = true;
+}
+bool vf_adc_ready(void) { return ready; }
+void vf_adc_cancel_samples(void)
+{
+    if (ready) board_adc_cancel();
+    request = completed = waiting = false;
+    wanted = THERMAL_ADC_AVERAGE_COUNT; sum = count = 0;
+}
+float vf_adc_vdda(void) { return vdda; }
+bool vf_adc_vdda_fallback(void) { return fallback; }
+bool vf_adc_begin_samples(unsigned n)
+{
+    if (!ready || request || n == 0 || n > 64) return false;
+    board_adc_cancel(); waiting = false; measuring_vref = true;
+    wanted = n; sum = count = 0; request = true; completed = false;
+    return true;
+}
+void vf_adc_service(void)
+{
+    if (!ready || completed) return;
+    uint32_t now = board_millis();
+    if (!waiting) {
+        if (!board_adc_begin(measuring_vref)) {
+            ready = valid = false; voltage = NAN; return;
+        }
+        waiting = true; conversion_ms = now; return;
+    }
+    uint16_t raw;
+    if (!board_adc_sample(&raw)) {
+        if ((uint32_t)(now-conversion_ms) > 5U) {
+            board_adc_cancel(); ready = valid = waiting = false; voltage = NAN;
+        }
+        return;
+    }
+    waiting = false;
+    if (measuring_vref) {
+        float estimate = vdda_from_vrefint(reference,raw);
+        fallback = !isfinite(estimate); vdda = fallback ? VDDA_NOMINAL_V : estimate;
+        measuring_vref = false; vref_ms = now; return;
+    }
+    last_raw=raw;
+    if (raw == 0 || raw >= 4095) {
+        valid = false; voltage = NAN; sum = count = 0;
+        if (request) completed = true;
+        return;
+    }
+    sum += raw;
+    if (++count < wanted) return;
+    voltage = convert((float)sum/count); valid = isfinite(voltage);
+    sample_ms = now; sum = count = 0;
+    if (request) completed = true;
+    else measuring_vref = (uint32_t)(now-vref_ms) >= 250U;
+}
+bool vf_adc_take_samples(float *out)
+{
+    if (!out || !request || !completed) return false;
+    *out = valid ? voltage : NAN;
+    request = completed = false; wanted = THERMAL_ADC_AVERAGE_COUNT;
+    return true; /* Completion may carry NAN; job must reject it. */
+}
+bool vf_adc_read_voltage(float *out)
+{
+    if (!out) return false;
+    *out = NAN;
+    if (!ready || !valid || (uint32_t)(board_millis()-sample_ms) > 1000U) return false;
+    *out = voltage; return true;
+}
+bool vf_adc_capture(unsigned n, float *out)
+{
+    if (!out) return false;
+    *out = NAN;
+    if (!ready || request || (uint32_t)(board_millis()-vref_ms) > 1000U) return false;
+    board_adc_cancel(); waiting = false; sum = count = 0;
+    float raw;
+    if (!board_adc_burst(n,&raw)) { valid = false; voltage = NAN; return false; }
+    voltage = convert(raw); valid = isfinite(voltage); sample_ms = board_millis();
+    *out = voltage; return valid;
+}

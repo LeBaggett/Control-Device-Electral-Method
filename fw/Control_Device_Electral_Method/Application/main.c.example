@@ -1,0 +1,16 @@
+/*
+ * Exemplo de main.c. Integre ao projeto STM32CubeIDE depois de conferir
+ * se board_init() já está declarado em board.h.
+ */
+#include "app.h"
+#include "board.h"
+
+int main(void)
+{
+    board_init();
+    app_init();
+
+    for (;;) {
+        app_run();
+    }
+}

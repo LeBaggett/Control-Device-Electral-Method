@@ -1,0 +1,9 @@
+# Regenerable compilation outputs
+Debug/
+Release/
+Build/
+Application/tests/build/
+**/__pycache__/
+*.o
+*.d
+*.su
