@@ -1,0 +1,54 @@
+# tests - guia de manutenção
+
+Testes no computador com hardware simulado/stubs. Usam GCC/Python e verificam contratos; não devem ser incluídos na imagem STM32.
+
+Documentação revisada em 26/10/2026. Os comentários e guias não alteram a lógica executável.
+
+## Subpastas
+
+| Pasta | Responsabilidade |
+|---|---|
+| [stubs](stubs/README.md) | Testes no computador com hardware simulado/stubs. Usam GCC/Python e verificam contratos; não devem ser incluídos na imagem STM32. |
+
+## Arquivos e implementações
+
+| Arquivo | Responsabilidade e manutenção |
+|---|---|
+| [adc_burst_adapter_test.c](adc_burst_adapter_test.c) | Teste automatizado de adc burst adapter. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `DWT_US_Delay`, `board_adc_cancel`, `board_adc_begin`, `HAL_ADC_GetValue`, `mock_nop`, `reset`, `main`. |
+| [adc_test.c](adc_test.c) | Teste automatizado de adc. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_adc_start`, `board_adc_begin`, `board_adc_sample`, `board_adc_cancel`, `board_vrefint_calibration`, `board_adc_burst`, `service`, `main`. |
+| [app_test.c](app_test.c) | Teste automatizado de app. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_init`, `board_is_ready`, `board_power_control_enabled`, `board_force_safe`, `board_millis`, `board_delay_us`, `board_power_select_measurement`, `board_power_relay_off`, `board_power_relay_on`, `board_power_select_heating`, `board_max31855_read32`, `board_oled_prepare`. |
+| [board_integration_test.c](board_integration_test.c) | Teste automatizado de board integration. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `record`, `mock_clock`, `HAL_Init`, `HAL_GPIO_WritePin`, `HAL_GPIO_Init`, `board_cube_clock_init`, `board_cube_gpio_init`, `board_cube_peripherals_init`, `HAL_Delay`, `HAL_GetTick`, `HAL_RCC_GetPCLK2Freq`, `DWT_US_Init`. |
+| [contract_check.c](contract_check.c) | Implementação C do módulo contract_check. Conferir o header correspondente e as chamadas antes de alterar. Entradas/símbolos para consulta: `main`. |
+| [dwt_test.c](dwt_test.c) | Teste automatizado de dwt. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `SystemCoreClockUpdate`, `mock_nop`, `main`. |
+| [fatfs_filesystem_roundtrip_test.c](fatfs_filesystem_roundtrip_test.c) | Teste automatizado de fatfs filesystem roundtrip. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `io_sector`, `check_image`, `main`. |
+| [import_logo.py](import_logo.py) | Módulo/script Python import_logo. As funções identificadas abaixo ajudam a localizar sua implementação. |
+| [input_temperature_test.c](input_temperature_test.c) | Teste automatizado de input temperature. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_encoder_start`, `board_encoder_counter`, `board_encoder_button_pressed`, `board_max31855_read32`, `step`, `main`. |
+| [job_test.c](job_test.c) | Teste automatizado de job. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `record`, `board_millis`, `board_is_ready`, `board_delay_us`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `vf_adc_ready`, `vf_adc_cancel_samples`, `vf_adc_begin_samples`, `vf_adc_take_samples`. |
+| [manual_k_job_test.c](manual_k_job_test.c) | Teste automatizado de manual k job. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `record`, `board_millis`, `board_is_ready`, `board_delay_us`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `vf_adc_ready`, `vf_adc_cancel_samples`, `vf_adc_capture`, `sdlog_ready`. |
+| [math_test.c](math_test.c) | Teste automatizado de math. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `main`. |
+| [oled_boot_test.c](oled_boot_test.c) | Teste automatizado de oled boot. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_oled_prepare`, `board_oled_controller`, `board_oled_column_offset`, `board_oled_write`, `main`. |
+| [oled_profiles_test.c](oled_profiles_test.c) | Teste automatizado de oled profiles. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_oled_prepare`, `board_oled_controller`, `board_oled_column_offset`, `board_oled_write`, `main`. |
+| [power_max31855_test.c](power_max31855_test.c) | Teste automatizado de power max31855. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `record`, `board_power_select_measurement`, `board_power_select_heating`, `board_power_relay_off`, `board_power_relay_on`, `board_max31855_read32`, `main`, `board_millis`. |
+| [render_previews.py](render_previews.py) | Módulo/script Python render_previews. As funções identificadas abaixo ajudam a localizar sua implementação. Entradas/símbolos para consulta: `chunk`. |
+| [render_splash.py](render_splash.py) | Módulo/script Python render_splash. As funções identificadas abaixo ajudam a localizar sua implementação. Entradas/símbolos para consulta: `chunk`. |
+| [require_cal_test.c](require_cal_test.c) | Teste automatizado de require cal. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `calibration_set`, `sdlog_ready`, `sdlog_open_run`, `sdlog_line`, `sdlog_close`, `sdlog_save_calibration`, `vf_adc_ready`, `vf_adc_begin_samples`, `vf_adc_take_samples`, `vf_adc_capture`, `vf_adc_cancel_samples`, `power_safe`. |
+| [run_filesystems_test.py](run_filesystems_test.py) | Teste automatizado de run filesystems. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. |
+| [run_tests.py](run_tests.py) | Executor de testes: configura ferramentas/compilações e reúne verificações. Conferir dependências e caminhos do ambiente. |
+| [sd_board_test.c](sd_board_test.c) | Teste automatizado de sd board. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `HAL_Delay`, `mock_sd_reset`, `HAL_GetTick`, `HAL_SD_GetCardState`, `main`. |
+| [sd_crc_retry_test.c](sd_crc_retry_test.c) | Teste automatizado de sd crc retry. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `HAL_SD_GetCardState`, `HAL_Delay`, `reset`, `main`. |
+| [sd_polling_complete_test.py](sd_polling_complete_test.py) | Teste automatizado de sd polling complete. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. |
+| [sdlog_test.c](sdlog_test.c) | Teste automatizado de sdlog. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_sd_is_ready`, `find`, `main`. |
+| [sofia_io_test.c](sofia_io_test.c) | Teste automatizado de sofia io. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_is_ready`, `board_adc_cancel`, `board_adc_begin`, `DWT_US_Delay`, `power_enable_measurement`, `mock_nop`, `HAL_ADC_GetValue`, `main`. |
+| [sofia_slow_sd_test.c](sofia_slow_sd_test.c) | Teste automatizado de sofia slow sd. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_is_ready`, `board_delay_us`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `board_adc_start`, `board_vrefint_calibration`, `board_adc_cancel`, `board_adc_begin`, `board_adc_sample`. |
+| [sofia_test.c](sofia_test.c) | Teste automatizado de sofia. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_is_ready`, `board_delay_us`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `vf_adc_ready`, `vf_adc_refresh_reference`, `vf_adc_cancel_samples`, `vf_adc_vdda`, `vf_adc_capture`. |
+| [tc_calibration_test.c](tc_calibration_test.c) | Teste automatizado de tc calibration. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `main`. |
+| [tc_heat_app_test.c](tc_heat_app_test.c) | Teste automatizado de tc heat app. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_is_ready`, `board_power_control_enabled`, `board_force_safe`, `board_debug_service`, `board_sd_prepare`, `power_init`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `rtd_init`. |
+| [tc_heater_test.c](tc_heater_test.c) | Teste automatizado de tc heater. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `record`, `board_millis`, `board_is_ready`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `tick`, `begin`, `main`. |
+| [tc_menu_app_test.c](tc_menu_app_test.c) | Teste automatizado de tc menu app. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_millis`, `board_is_ready`, `board_power_control_enabled`, `board_force_safe`, `board_debug_service`, `board_sd_prepare`, `power_init`, `power_safe`, `power_enable_measurement`, `power_relay_on`, `power_select_heating`, `rtd_init`. |
+| [ui_driver_test.c](ui_driver_test.c) | Teste automatizado de ui driver. Ler os asserts e os stubs antes de interpretar cobertura; não equivale a ensaio físico. Entradas/símbolos para consulta: `board_oled_prepare`, `board_oled_controller`, `board_oled_column_offset`, `save_screen`, `board_millis`, `board_oled_write`, `board_encoder_start`, `board_encoder_counter`, `board_encoder_button_pressed`, `event`, `main`. |
+
+## Observações para manutenção
+
+Antes de alterar interfaces, procure seus consumidores e testes. Após mudanças, revise o diff e compile o projeto correspondente; confirme em bancada quando houver efeito elétrico ou temporal.
+
+[Voltar à pasta superior](../README.md)

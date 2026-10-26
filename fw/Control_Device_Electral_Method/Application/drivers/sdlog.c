@@ -36,6 +36,9 @@ static bool storage_error(void)
     if (open_run) { (void)f_close(&run); open_run = false; }
     return false;
 }
+/* Recuperacao restrita a montagem: nao reutilizar esta rotina como retry de
+ * f_write/f_sync. Uma escrita que retorna erro pode ter alterado parte do arquivo.
+ * Manter a numeracao sem sobrescrita e o CRC/backup das calibracoes. */
 void sdlog_init(void)
 {
     g_sd_filesystem_type = 0;

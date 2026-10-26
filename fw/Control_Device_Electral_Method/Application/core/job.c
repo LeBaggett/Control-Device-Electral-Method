@@ -31,6 +31,8 @@ static struct {
 job_error_t job_error(void) { return job.error; }
 job_kind_t job_kind(void) { return job.kind; }
 void job_init(void) { memset(&job,0,sizeof(job)); g_manual_k_debug=(manual_k_debug_t){0}; job.status = JOB_STATUS_IDLE; }
+/* Saida compartilhada de termino/erro/aborto. Desenergizar antes de fechar
+ * o arquivo: FatFs pode bloquear ou falhar e nao deve manter o DUT aquecendo. */
 static void stop(void)
 {
     power_safe(); vf_adc_cancel_samples();

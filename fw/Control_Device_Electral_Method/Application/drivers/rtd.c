@@ -2,6 +2,8 @@
 #include "max31855.h"
 #include "tc_calibration.h"
 /* Compatibilidade temporária com a API anterior; sensor agora é termopar. */
+/* O nome rtd e legado de interface. O hardware desta versao e MAX31855 com
+ * termopar; este adaptador aplica ganho/offset e nao implementa MAX31865/PT100. */
 void rtd_init(void) { max31855_init(); }
 bool rtd_read_temperature(float *temperature_c)
 {

@@ -33,6 +33,9 @@ void vf_adc_cancel_samples(void)
 }
 float vf_adc_vdda(void) { return vdda; }
 bool vf_adc_vdda_fallback(void) { return fallback; }
+/* VREFINT estima VDDA; nao e uma medida da corrente de polarizacao do DUT.
+ * Esta atualizacao cancela a aquisicao de fundo: executar fora da janela
+ * critica SELECT -> espera em us -> Vf e antes de usar a referencia no TSP. */
 bool vf_adc_refresh_reference(void)
 {
     g_vf_debug.reference_refreshes++;

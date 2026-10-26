@@ -17,6 +17,9 @@ static bool completed(uint32_t start) {
  }
  return sofia_io_elapsed_us(start)<400U;
 }
+/* Captura quente do TSP: aquecer o ADC antes da comutacao evita incluir seu
+ * tempo de partida na leitura util. A conversao de preparo e descartada.
+ * Os tempos registrados sao de software; nao medem a acomodacao fisica do DUT. */
 bool sofia_io_capture(unsigned delay_us,sofia_capture_t *out) {
  if(!out || delay_us<5 || delay_us>1000 || !board_is_ready() || !DWT_US_Delay(0))return false;
  *out=(sofia_capture_t){0};board_adc_cancel();

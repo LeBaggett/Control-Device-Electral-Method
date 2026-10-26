@@ -13,6 +13,9 @@
 #include <string.h>
 #define IH_A 0.758f
 #define IM_A 0.002f
+/* Instantes desejados de resfriamento, relativos ao corte, em microssegundos.
+ * O CSV registra o tempo efetivo: o superloop pode perder um instante curto.
+ * Nao preencher amostras perdidas com valores repetidos ou tempos nominais. */
 static const uint32_t cooling_us[]={1000,2000,5000,10000,20000,50000,100000,200000,500000,1000000,2000000,5000000};
 typedef struct {float vf,tc,tj;uint32_t from_cut_us;} point_t;
 static point_t points[14];

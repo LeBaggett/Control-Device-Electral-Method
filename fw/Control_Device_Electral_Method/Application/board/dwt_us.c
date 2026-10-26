@@ -20,6 +20,8 @@ bool DWT_US_Init(void)
     return true;
 }
 
+/* Diferenca sem sinal suporta wrap do contador para os atrasos curtos aceitos.
+ * Se o clock mudar depois do init, recusar o atraso em vez de usar escala antiga. */
 bool DWT_US_Delay(uint32_t us)
 {
     if (!core_hz || core_hz != SystemCoreClock || us > 1000U ||

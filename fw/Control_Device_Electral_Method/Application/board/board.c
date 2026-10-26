@@ -76,6 +76,9 @@ static void board_safe_gpio_early(void)
     io.Pin = PIN_TC_CS;
     HAL_GPIO_Init(PIN_TC_CS_PORT, &io);
 }
+/* Ordem de partida: HAL -> GPIOs seguros -> clocks -> GPIOs gerados -> DWT
+ * -> perifericos. Reaplicar o estado seguro evita que a configuracao gerada
+ * pelo CubeMX altere SELECT/rele durante a transicao. Nao mover para o superloop. */
 void board_init(void)
 {
     s_board_ready = false;

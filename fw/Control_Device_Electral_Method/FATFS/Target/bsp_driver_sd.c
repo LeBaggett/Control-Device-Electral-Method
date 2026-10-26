@@ -151,6 +151,8 @@ __weak uint8_t BSP_SD_ReadBlocks(uint32_t *pData, uint32_t ReadAddr, uint32_t Nu
   * @param  Timeout: Timeout for write operation
   * @retval SD status
   */
+/* Camada BSP: preservar o erro HAL antes de consultar CMD13, que pode alterar
+ * ErrorCode. Nao repetir escrita automaticamente, pois ela pode ser parcial. */
 __weak uint8_t BSP_SD_WriteBlocks(uint32_t *pData, uint32_t WriteAddr, uint32_t NumOfBlocks, uint32_t Timeout)
 {
   /* Capture before any CMD13/status poll can overwrite hsd.ErrorCode.
