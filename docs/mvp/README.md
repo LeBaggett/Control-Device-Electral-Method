@@ -1,5 +1,7 @@
 # MVP - arquitetura e escopo inicial
 
+[AnotaÃ§Ã£o resumida para apresentar Ã  equipe](ANOTACAO_ARQUITETURA_EQUIPE.md)
+
 ## Estrutura inicial no repositório
 
 - Firmware novo: `fw/Control_Device_Electral_Method_MVP`, dividido em Application, Core, Drivers, Middlewares e LWIP.
