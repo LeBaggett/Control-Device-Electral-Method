@@ -45,7 +45,9 @@ flowchart LR
 - Três termopares.
 - Transceptor RS-485 MAX485; conferir níveis elétricos com o H753.
 - DUTs DDR5 e LPDDR5.
-- Nova fonte de corrente, sem assumir os valores da POC.
+- Fonte com correntes fixas ajustadas no circuito, sem telemetria de corrente e sem ajuste por firmware. Confirmar os valores numéricos para os DUTs.
+- Firmware sem RTOS, com superloop cooperativo, máquinas de estado, DMA e interrupções curtas.
+- Prazo informado pela equipe: quatro meses.
 - Calibração com aquecedor externo comandado pelo STM32.
 
 ## Pendências
@@ -54,7 +56,7 @@ flowchart LR
 |---|---|
 | Três canais | Cada N1040i possui uma entrada; definir quantidade de indicadores ou conversor multicanal. |
 | Memórias | Receber datasheets para confirmar sinal termossensível acessível, alimentação e forma de aquecimento. |
-| Fonte de corrente | Dimensionar faixa, tensão e proteção a partir dos DUTs. |
+| Fonte de corrente | Dimensionar valores fixos, tensão e proteção a partir dos DUTs; corrente será declarada nos resultados. |
 | Aquecedor | Escolher tipo, potência, faixa e estágio de acionamento. |
 | Termopares | Definir posição e grandeza física de cada canal. |
 | Persistência | Definir preservação dos resultados após desligamento/perda da conexão. |
