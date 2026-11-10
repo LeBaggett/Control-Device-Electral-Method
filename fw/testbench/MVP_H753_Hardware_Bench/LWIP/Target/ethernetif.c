@@ -655,8 +655,9 @@ void HAL_ETH_RxLinkCallback(void **pStart, void **pEnd, uint8_t *buff, uint16_t 
     p->tot_len += Length;
   }
 
-  /* Invalidate data cache because Rx DMA's writing to physical memory makes it stale. */
-  SCB_InvalidateDCache_by_Addr((uint32_t *)buff, Length);
+  /* Stage 1 deliberately runs with D-cache OFF: DMA data is already visible.
+   * Do not execute cache maintenance here. Enabling D-cache later requires
+   * a complete RX/TX coherency policy, including aligned buffers and MPU. */
 }
 
 void HAL_ETH_TxFreeCallback(uint32_t * buff)
