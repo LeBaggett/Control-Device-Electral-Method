@@ -2,7 +2,7 @@
 
 ## O que foi preparado
 
-Firmware `0.2.0-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 1. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
+Firmware `0.2.1-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
 
 O servidor continua em `http://192.168.7.2/`. O painel N1040i consulta `GET /api/n1040`; a API anterior `/api/status` continua disponível. A página é incorporada na Flash com o firmware.
 
@@ -35,8 +35,8 @@ No N1040i RA-485, conforme manual V2.0x fornecido:
 
 No teclado ou QuickTune, ajustar:
 
-- `Addr = 1`.
-- `bAud = 9600` (o valor 3 na tabela de registradores corresponde a 9600).
+- `Addr = 247`.
+- `bAud = 115200` (o valor 7 na tabela de registradores corresponde a 115200).
 - `Prty = none`, sem paridade. Dados: 8 bits, 1 stop bit.
 - `tYPE = Tc J` ou `Tc K`, conforme o termopar efetivamente conectado.
 - Unidade em °C para os ensaios futuros. O painel também reconhece °F pelo Status Word 2 e não rotula o valor como °C incorretamente.
@@ -70,7 +70,7 @@ Sem módulo/instrumento conectado, timeouts são esperados e não devem acender 
 | `g_n1040_debug` | Diagnóstico completo do protocolo, `node[0]` é o primeiro indicador |
 | `g_rs485_debug` | Inicialização UART/DMA, bytes, erros, reinícios e direção |
 
-Padrão: uma requisição a cada 250 ms, timeout 400 ms, validade máxima 5 s. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). Um instrumento atualiza PV aproximadamente a cada 500 ms com respostas rápidas. Para três, configurar `BENCH_N1040_COUNT = 3` e endereços exclusivos 1, 2, 3; ciclo nominal por instrumento aproximadamente 1,5 s. Testes de três nós foram feitos em simulação, ainda não fisicamente.
+Padrão: uma requisição a cada 250 ms, timeout 400 ms, validade máxima 5 s. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). Um instrumento atualiza PV aproximadamente a cada 500 ms com respostas rápidas. Para três, configurar `BENCH_N1040_COUNT = 3` e endereços exclusivos 247, 246, 245, nesta ordem decrescente; ciclo nominal por instrumento aproximadamente 1,5 s. Testes de três nós foram feitos em simulação, ainda não fisicamente.
 
 ## Diagnóstico e causas possíveis
 

@@ -47,7 +47,7 @@ int main(void){
  n1040_init(0);assert(!g_n1040_debug.node[0].valid);
  /* Sequential round-robin, status then PV for every configured instrument. */
  for(unsigned i=0;i<BENCH_N1040_COUNT;i++){
-  uint32_t t=250+500*i;n1040_step(t);assert(request[0]==i+1 && request[3]==6 && request[5]==5);
+  uint32_t t=250+500*i;n1040_step(t);assert(request[0]==247-i && request[3]==6 && request[5]==5);
   respond(status,5,t+10);assert(!g_n1040_debug.node[i].valid);
   n1040_step(t+250);assert(request[3]==1 && request[5]==1);respond(pv,1,t+260);
   assert(g_n1040_debug.node[i].valid && g_n1040_debug.node[i].pv_tenths==298);
@@ -73,7 +73,7 @@ int main(void){
  assert(g_n1040_debug.node[0].timeouts==1 && !g_n1040_debug.node[0].valid);
  n1040_init(0);n1040_step(250);g_rs485_debug.uart_errors++;blocked=1;n1040_step(260);
  assert(g_n1040_debug.node[0].last_error==8 && !g_n1040_debug.waiting);
- n1040_init(0);n1040_step(250);incoming[0]=1;incoming[1]=0x83;incoming[2]=2;crc(incoming,3);incoming_size=5;
+ n1040_init(0);n1040_step(250);incoming[0]=request[0];incoming[1]=0x83;incoming[2]=2;crc(incoming,3);incoming_size=5;
  n1040_step(260);assert(g_n1040_debug.node[0].exceptions==1 && g_n1040_debug.node[0].exception_code==2);
  n1040_init(0);n1040_step(250);respond(status,5,260);n1040_step(500);respond(pv,1,510);
  blocked=1;n1040_step(6000);assert(!g_n1040_debug.node[0].valid && !g_n1040_debug.node[0].online);
@@ -100,6 +100,8 @@ with tempfile.TemporaryDirectory(prefix='n1040-tests-') as td:
    str(root/'Application/modbus_read.c'),'-o',str(exe)],check=True)
   result=json.loads(subprocess.check_output([str(exe)],text=True))
   assert result['count']==nodes and len(result['nodes'])==nodes
+  assert result['baud']==115200 and result['parity']==0
+  assert [n['address'] for n in result['nodes']]==[247,246,245][:nodes]
   assert all(n['valid'] and n['pv_tenths']==298 for n in result['nodes'])
   print(f'PASS: {nodes} node(s): real codec/scheduler, CRC, signed PV, status, ID, Fahrenheit, exceptions, timeout, UART error, stale data, wrap, JSON')
  html=(root/'Application/ui/index.html').read_text(encoding='utf-8')
