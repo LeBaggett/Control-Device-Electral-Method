@@ -15,7 +15,7 @@ Leia primeiro [INTEGRACAO_N1040I.md](INTEGRACAO_N1040I.md) para ligação, confi
 - Página de diagnóstico e endpoint somente leitura **`GET /api/status`**.
 - Diagnósticos em **`g_bench_debug`**, inclusive erros HAL/DMA e mudança de link.
 
-RS485 implementado em leitura: USART2 PD5/PD6, direção PD4, RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, um indicador ativo inicialmente em 247, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
+RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, um indicador ativo inicialmente em 247, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
 
 ## Estratégia e motivos
 

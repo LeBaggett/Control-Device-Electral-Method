@@ -13,7 +13,9 @@
 #define BENCH_ETH_PC_PINS (GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5)
 #define BENCH_ETH_PG_PINS (GPIO_PIN_11|GPIO_PIN_13)
 #define BENCH_ETH_PB_PINS GPIO_PIN_13
-/* USART2: independent of USART3/ST-LINK virtual COM and RMII pins.
+/* PD4 is reserved only for BENCH_RS485_MANUAL_DIRECTION=1.
+ * Automatic-direction modules use no DE/RE GPIO.
+ * USART2: independent of USART3/ST-LINK virtual COM and RMII pins.
  * PD4 drives DE and /RE tied together: LOW=receive, HIGH=transmit. */
 #define BENCH_RS485_TX_PIN GPIO_PIN_5
 #define BENCH_RS485_RX_PIN GPIO_PIN_6

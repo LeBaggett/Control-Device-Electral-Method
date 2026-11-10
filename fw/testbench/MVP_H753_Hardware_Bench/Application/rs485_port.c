@@ -17,8 +17,13 @@ DMA_HandleTypeDef g_rs485_rx_dma;
 volatile rs485_debug_t g_rs485_debug;
 static uint32_t gap_cycles;
 static void direction(unsigned tx_active){
+#if BENCH_RS485_MANUAL_DIRECTION
  HAL_GPIO_WritePin(BENCH_RS485_DIR_PORT,BENCH_RS485_DIR_PIN,tx_active?GPIO_PIN_SET:GPIO_PIN_RESET);
  g_rs485_debug.direction_tx=tx_active;
+#else
+ /* External module owns direction; no direction GPIO is configured/driven. */
+ (void)tx_active;g_rs485_debug.direction_tx=0;
+#endif
 }
 static int quiet(void){
  return (uint32_t)(HAL_GetTick()-last_ms)>=10U || (uint32_t)(DWT->CYCCNT-last_cycles)>=gap_cycles;
@@ -31,8 +36,10 @@ static int arm_rx(void){
 void rs485_init(uint32_t now){
  GPIO_InitTypeDef gpio={0};RCC_PeriphCLKInitTypeDef clock={0};
  __HAL_RCC_GPIOD_CLK_ENABLE();direction(0);
+#if BENCH_RS485_MANUAL_DIRECTION
  gpio.Pin=BENCH_RS485_DIR_PIN;gpio.Mode=GPIO_MODE_OUTPUT_PP;gpio.Pull=GPIO_PULLDOWN;
  gpio.Speed=GPIO_SPEED_FREQ_LOW;HAL_GPIO_Init(BENCH_RS485_DIR_PORT,&gpio);
+#endif
  gpio.Pin=BENCH_RS485_TX_PIN|BENCH_RS485_RX_PIN;gpio.Mode=GPIO_MODE_AF_PP;
  gpio.Alternate=GPIO_AF7_USART2;gpio.Pull=GPIO_PULLUP;gpio.Speed=GPIO_SPEED_FREQ_HIGH;
  HAL_GPIO_Init(GPIOD,&gpio);

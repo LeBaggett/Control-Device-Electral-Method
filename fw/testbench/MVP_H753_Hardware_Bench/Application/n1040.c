@@ -82,8 +82,9 @@ void n1040_step(uint32_t now){
 }
 int n1040_json(char *out,size_t capacity){
  if(!out || !capacity)return -1;
- int n=snprintf(out,capacity,"{\"enabled\":%lu,\"baud\":%u,\"parity\":%u,\"count\":%lu,\"waiting\":%lu,\"uart_init\":%lu,\"uart_error\":%lu,\"uart_errors\":%lu,\"rx_bytes\":%lu,\"overruns\":%lu,\"restarts\":%lu,\"nodes\":[",
+ int n=snprintf(out,capacity,"{\"enabled\":%lu,\"baud\":%u,\"parity\":%u,\"direction\":\"%s\",\"count\":%lu,\"waiting\":%lu,\"uart_init\":%lu,\"uart_error\":%lu,\"uart_errors\":%lu,\"rx_bytes\":%lu,\"overruns\":%lu,\"restarts\":%lu,\"nodes\":[",
  (unsigned long)g_n1040_debug.enabled,BENCH_RS485_BAUD,BENCH_RS485_PARITY,
+ BENCH_RS485_MANUAL_DIRECTION?"manual":"auto",
  (unsigned long)g_n1040_debug.count,(unsigned long)g_n1040_debug.waiting,
  (unsigned long)g_rs485_debug.init_status,(unsigned long)g_rs485_debug.uart_error,
  (unsigned long)g_rs485_debug.uart_errors,(unsigned long)g_rs485_debug.rx_bytes,

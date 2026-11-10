@@ -2,11 +2,21 @@
 
 ## O que foi preparado
 
-Firmware `0.2.1-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
+Firmware `0.2.2-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
 
 O servidor continua em `http://192.168.7.2/`. O painel N1040i consulta `GET /api/n1040`; a API anterior `/api/status` continua disponível. A página é incorporada na Flash com o firmware.
 
-## Ligação
+## Módulo com direção automática (padrão atual)
+
+`BENCH_RS485_MANUAL_DIRECTION = 0`: usar somente TX, RX, VCC e GND no lado TTL. **PD4 não é configurado nem acionado**. O módulo deve comutar a direção por hardware; confirmar o modelo antes de presumir características elétricas. No lado TTL, saída TX do STM (PD5) vai à entrada RX do módulo; saída TX do módulo vai ao RX do STM (PD6), quando os rótulos são do ponto de vista do módulo. Alguns fabricantes usam rótulos de conexão ao host: consultar o esquema/foto do módulo.
+
+No lado RS485, o módulo informado tem A+ e B−: usar a indicação de polaridade, A+ → D+ (borne 15) e B− → D− (borne 16), referência de comunicação → borne 17. Não usar apenas a letra A/B para inferir polaridade. VCC deve seguir a especificação do módulo; as etiquetas TX/RX não garantem lógica de 3,3 V.
+
+Manter 115200 baud/8N1, endereço inicial 247. A mudança de direção automática não demonstra que o timeout está resolvido: verificar bytes/respostas na placa. Se o módulo devolver eco local, ele poderá exigir tratamento adicional; o firmware atual valida quadros recebidos e não os aceita como medição se tiverem formato incorreto.
+
+Para módulo com DE e /RE expostos, selecionar `BENCH_RS485_MANUAL_DIRECTION = 1`; a ligação e o funcionamento descritos abaixo aplicam-se a esse modo.
+
+## Ligação no modo manual
 
 O STM32 precisa de um **transceptor RS485** entre a UART e os bornes do instrumento. Não conectar A/B diretamente à NUCLEO.
 

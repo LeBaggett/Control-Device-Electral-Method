@@ -101,6 +101,7 @@ with tempfile.TemporaryDirectory(prefix='n1040-tests-') as td:
   result=json.loads(subprocess.check_output([str(exe)],text=True))
   assert result['count']==nodes and len(result['nodes'])==nodes
   assert result['baud']==115200 and result['parity']==0
+  assert result['direction']=='auto'
   assert [n['address'] for n in result['nodes']]==[247,246,245][:nodes]
   assert all(n['valid'] and n['pv_tenths']==298 for n in result['nodes'])
   print(f'PASS: {nodes} node(s): real codec/scheduler, CRC, signed PV, status, ID, Fahrenheit, exceptions, timeout, UART error, stale data, wrap, JSON')
