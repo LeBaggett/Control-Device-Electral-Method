@@ -13,5 +13,11 @@
 #define BENCH_ETH_PC_PINS (GPIO_PIN_1|GPIO_PIN_4|GPIO_PIN_5)
 #define BENCH_ETH_PG_PINS (GPIO_PIN_11|GPIO_PIN_13)
 #define BENCH_ETH_PB_PINS GPIO_PIN_13
+/* USART2: independent of USART3/ST-LINK virtual COM and RMII pins.
+ * PD4 drives DE and /RE tied together: LOW=receive, HIGH=transmit. */
+#define BENCH_RS485_TX_PIN GPIO_PIN_5
+#define BENCH_RS485_RX_PIN GPIO_PIN_6
+#define BENCH_RS485_DIR_PORT GPIOD
+#define BENCH_RS485_DIR_PIN GPIO_PIN_4
 /* No relay, SELECT, DAC, heater or DUT source pins are configured here. */
 #endif

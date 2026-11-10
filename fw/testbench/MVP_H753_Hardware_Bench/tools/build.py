@@ -10,7 +10,7 @@ if not compiler:
 compiler=Path(compiler);build=root/'Build';build.mkdir(exist_ok=True)
 include=['Core/Inc','Application','Application/board','Application/ui','LWIP/Target','LWIP/App','Drivers/STM32H7xx_HAL_Driver/Inc','Drivers/STM32H7xx_HAL_Driver/Inc/Legacy','Drivers/CMSIS/Include','Drivers/CMSIS/Device/ST/STM32H7xx/Include','Drivers/BSP/Components/lan8742','Middlewares/Third_Party/LwIP/src/include']
 flags=['-mcpu=cortex-m7','-mthumb','-mfpu=fpv5-d16','-mfloat-abi=hard','-DSTM32H753xx','-DUSE_HAL_DRIVER','-Og','-g3','-ffunction-sections','-fdata-sections','-fno-common']+['-I'+str(root/p) for p in include]
-hal=['hal','hal_cortex','hal_dma','hal_dma_ex','hal_eth','hal_exti','hal_flash','hal_flash_ex','hal_gpio','hal_pwr','hal_pwr_ex','hal_rcc','hal_rcc_ex']
+hal=['hal','hal_cortex','hal_dma','hal_dma_ex','hal_eth','hal_exti','hal_flash','hal_flash_ex','hal_gpio','hal_pwr','hal_pwr_ex','hal_rcc','hal_rcc_ex','hal_uart','hal_uart_ex']
 sources=list((root/'Core/Src').glob('*.c'))+list((root/'Application').rglob('*.c'))+list((root/'LWIP').rglob('*.c'))
 sources=[p for p in sources if 'tests' not in p.parts]
 sources += [root/'Drivers/STM32H7xx_HAL_Driver/Src'/('stm32h7xx_'+x+'.c') for x in hal]

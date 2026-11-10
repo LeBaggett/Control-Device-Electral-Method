@@ -28,3 +28,19 @@ Registrar versão, fonte de alimentação, topologia, horário, contadores e fal
 ## Fora desta entrega
 
 RS-485/Modbus, IHM, termopares, ADC/timer TSP, corrente, aquecedor, ajuste de cache/MPU final e ensaio térmico. Nenhuma dessas funções foi simulada como se estivesse operando no dispositivo.
+
+
+## Etapa 2 — N1040i (2026-11-09)
+
+O usuário confirmou acesso HTTP da etapa anterior após correção da manutenção indevida de cache no RX Ethernet. Isso não valida a serial nova.
+
+Testes novos: `Application/tests/run_n1040_tests.py` (codec e estados reais com transporte simulado, 1 e 3 nós). Regressão: `Application/tests/run_tests.py`. Compilação ARM e integração CubeIDE verificadas nesta entrega; consulte INTEGRACAO_N1040I.md.
+
+| Verificação física | Estado |
+|---|---|
+| Um N1040i: ID, status e PV iguais ao display | Pendente |
+| DE/RE retorna a RX após último stop bit | Pendente |
+| Retirar/reconectar serial sem bloquear Ethernet | Pendente |
+| Sensor desconectado não resulta em temperatura válida | Pendente |
+| Teste contínuo 30 min e duas abas HTTP | Pendente |
+| Três indicadores com endereços distintos | Pendente |

@@ -1,6 +1,8 @@
-# Testbench MVP H753 - etapa 1: base + Ethernet
+# Testbench MVP H753 - etapa 2: Ethernet + N1040i / RS485
 
-Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, HAL/CMSIS/LwIP/PHY com versões fixadas e metadados de projeto CubeIDE. **Compilação e testes no computador foram executados; não houve gravação nem validação física da placa.**
+Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, HAL/CMSIS/LwIP/PHY com versões fixadas e metadados de projeto CubeIDE. **Acesso HTTP da etapa anterior confirmado pelo usuário na placa após corrigir o callback de cache Ethernet. A nova integração N1040i foi compilada/testada no computador; validação física da serial pendente.**
+
+Leia primeiro [INTEGRACAO_N1040I.md](INTEGRACAO_N1040I.md) para ligação, configuração, estratégia, diagnósticos e roteiro de bancada.
 
 ## O que está implementado
 
@@ -13,7 +15,7 @@ Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, 
 - Página de diagnóstico e endpoint somente leitura **`GET /api/status`**.
 - Diagnósticos em **`g_bench_debug`**, inclusive erros HAL/DMA e mudança de link.
 
-RS-485, IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. A bancada não configura pinos de atuação; para este teste use somente a NUCLEO, sem shield/DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
+RS485 implementado em leitura: USART2 PD5/PD6, direção PD4, RX DMA circular e função Modbus 03, endereço inicial 1/9600/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
 
 ## Estratégia e motivos
 
@@ -52,6 +54,7 @@ Com Python 3 e GCC ARM disponível (ou variável `ARM_GCC` apontando para o exec
 ```text
 python tools/build.py
 python Application/tests/run_tests.py
+python Application/tests/run_n1040_tests.py
 ```
 
 O build alternativo produz `Build/MVP_H753_Hardware_Bench.elf` e `.bin`, com otimização de depuração `-Og`. O CubeIDE usa sua configuração Debug; os tamanhos e binários podem diferir. Ambos foram compilados para Cortex-M7/H753.
@@ -78,6 +81,6 @@ Esperados: boot_stage 5 (aplicação/servidor iniciados), fatal_code 0, core_hz 
 
 ## Critérios e limites
 
-Consulte [VALIDACAO.md](VALIDACAO.md). A próxima etapa só adiciona RS-485 após comprovar base/Ethernet. Depois vem aquisição de tensão conhecida, e só então teste simultâneo das três interfaces.
+Consulte [VALIDACAO.md](VALIDACAO.md). A etapa atual adiciona RS485/N1040i, mantendo a Ethernet. Validar primeiro um indicador, depois três. Em seguida vem aquisição de tensão conhecida, e só então teste simultâneo das três interfaces.
 
 Referências: [UM2407](https://www.st.com/resource/en/user_manual/um2407-stm32h7-nucleo144-boards-mb1364-stmicroelectronics.pdf) e exemplo oficial [LwIP HTTP Raw da ST](https://github.com/STMicroelectronics/STM32CubeH7/tree/master/Projects/STM32H743I-EVAL/Applications/LwIP/LwIP_HTTP_Server_Raw). O ethernetif foi adaptado; não é o exemplo EVAL sem alterações.

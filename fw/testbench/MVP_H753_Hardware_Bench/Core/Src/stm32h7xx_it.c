@@ -1,6 +1,10 @@
 #include "main.h"
 #include "bench_diag.h"
 extern ETH_HandleTypeDef EthHandle;
+extern UART_HandleTypeDef g_rs485_uart;
+extern DMA_HandleTypeDef g_rs485_rx_dma;
+void USART2_IRQHandler(void){HAL_UART_IRQHandler(&g_rs485_uart);}
+void DMA1_Stream0_IRQHandler(void){HAL_DMA_IRQHandler(&g_rs485_rx_dma);}
 void SysTick_Handler(void){HAL_IncTick();}
 void ETH_IRQHandler(void){HAL_ETH_IRQHandler(&EthHandle);}
 void NMI_Handler(void){bench_fatal(101);}

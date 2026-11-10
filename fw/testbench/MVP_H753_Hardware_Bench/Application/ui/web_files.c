@@ -1,6 +1,7 @@
 #include "lwip/apps/fs.h"
 #include "lwip/mem.h"
 #include "bench_diag.h"
+#include "n1040.h"
 #include "index_html.h"
 #include <stdio.h>
 #include <string.h>
@@ -9,14 +10,14 @@ int fs_open_custom(struct fs_file *file,const char *name) {
  if(strcmp(name,"/index.html")==0 || strcmp(name,"/")==0) {
   g_bench_debug.http_requests++;
   file->data=(const char *)bench_index_http;file->len=sizeof(bench_index_http);
- } else if(strcmp(name,"/api/status")==0) {
+ } else if((strcmp(name,"/api/status")==0 || strcmp(name,"/api/n1040")==0)) {
   g_bench_debug.http_requests++;
-  char body[1024];int length=bench_diag_json(body,sizeof(body));
+  char body[2560];int length=strcmp(name,"/api/n1040")==0?n1040_json(body,sizeof(body)):bench_diag_json(body,sizeof(body));
   if(length<0)return 0;
-  char *data=mem_malloc(1536);
+  char *data=mem_malloc(3072);
   if(!data){g_bench_debug.http_alloc_failures++;return 0;}
-  int n=snprintf(data,1536,"HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nCache-Control: no-store\r\nConnection: close\r\nContent-Length: %d\r\n\r\n%s",length,body);
-  if(n<0 || n>=1536){mem_free(data);return 0;}
+  int n=snprintf(data,3072,"HTTP/1.0 200 OK\r\nContent-Type: application/json\r\nCache-Control: no-store\r\nConnection: close\r\nContent-Length: %d\r\n\r\n%s",length,body);
+  if(n<0 || n>=3072){mem_free(data);return 0;}
   file->data=data;file->len=n;file->pextension=data;
  } else return 0;
  file->index=file->len;file->flags=FS_FILE_FLAGS_HEADER_INCLUDED;
