@@ -40,9 +40,14 @@ void rs485_init(uint32_t now){
  gpio.Pin=BENCH_RS485_DIR_PIN;gpio.Mode=GPIO_MODE_OUTPUT_PP;gpio.Pull=GPIO_PULLDOWN;
  gpio.Speed=GPIO_SPEED_FREQ_LOW;HAL_GPIO_Init(BENCH_RS485_DIR_PORT,&gpio);
 #endif
- gpio.Pin=BENCH_RS485_TX_PIN|BENCH_RS485_RX_PIN;gpio.Mode=GPIO_MODE_AF_PP;
+ gpio.Pin=BENCH_RS485_TX_PIN;gpio.Mode=GPIO_MODE_AF_PP;
  gpio.Alternate=GPIO_AF7_USART2;gpio.Pull=GPIO_PULLUP;gpio.Speed=GPIO_SPEED_FREQ_HIGH;
  HAL_GPIO_Init(GPIOD,&gpio);
+ /* PD6 is FT_h. Disable internal pulls for an externally driven RX level
+  * above VDD. STM32 must be powered; never drive another output into PD5.
+  * If a manual transceiver leaves RO floating while disabled, provide an
+  * appropriate external idle bias rather than enabling an internal pull. */
+ gpio.Pin=BENCH_RS485_RX_PIN;gpio.Pull=GPIO_NOPULL;HAL_GPIO_Init(GPIOD,&gpio);
  clock.PeriphClockSelection=RCC_PERIPHCLK_USART2;clock.Usart234578ClockSelection=RCC_USART234578CLKSOURCE_D2PCLK1;
  if(HAL_RCCEx_PeriphCLKConfig(&clock)!=HAL_OK){g_rs485_debug.init_status=10;return;}
  __HAL_RCC_USART2_CLK_ENABLE();__HAL_RCC_DMA1_CLK_ENABLE();

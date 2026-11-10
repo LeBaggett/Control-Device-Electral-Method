@@ -2,7 +2,7 @@
 
 ## O que foi preparado
 
-Firmware `0.2.2-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
+Firmware `0.2.3-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
 
 O servidor continua em `http://192.168.7.2/`. O painel N1040i consulta `GET /api/n1040`; a API anterior `/api/status` continua disponível. A página é incorporada na Flash com o firmware.
 
@@ -40,6 +40,14 @@ No N1040i RA-485, conforme manual V2.0x fornecido:
 **A/B têm convenções diferentes entre fabricantes.** Relacione o módulo por D+/D− e pela folha de dados; não presuma que o A de todo módulo corresponde ao borne A do N1040i. Use par trançado, barramento linear, terminação de 120 Ω apenas nas duas extremidades físicas e polarização em um ponto, considerando os resistores já existentes nos módulos. Não conectar 24 V ao GND de sinal por engano; alimentação do instrumento e comunicação são circuitos distintos.
 
 **MAX485 clássico:** usa alimentação de 5 V. Não alimentá-lo com 3,3 V presumindo operação garantida. Antes de ligar RO ao STM32, verificar o circuito do módulo e compatibilidade de tensão; usar adaptação de nível se necessário. Uma alternativa de transceptor com lógica/alimentação de 3,3 V é MAX3485. O firmware é o mesmo para módulos half-duplex com DI, RO, DE e /RE; módulos com direção automática precisam de revisão do esquema de conexão. A alimentação de 24 V do modelo do N1040i não alimenta a NUCLEO nem o transceptor diretamente.
+
+## Entrada UART de 5 V
+
+Na versão 0.2.3, PD6/USART2_RX é configurado separadamente com `GPIO_NOPULL`. PD5 permanece saída UART de aproximadamente 3,3 V. Ambos são FT_h no datasheet STM32H753ZI, mas tolerância em entrada não autoriza ligar duas saídas em oposição nem alimentar VDD com 5 V. Manter o STM alimentado e GND comum; confirmar qual pino do módulo é saída antes de reconectar. Em modo manual, caso RO fique em alta impedância com /RE alto, prover polarização externa apropriada para manter RX ocioso, sem pull interno.
+
+Tensão alta em repouso, isoladamente, não prova que um pino seja saída: pode haver um pull-up em uma entrada. Para resolver TXD/RXD, usar esquema do módulo ou verificar continuidade até DI/RO do transceptor identificado, com toda a alimentação desligada.
+
+Referência: https://www.st.com/resource/en/datasheet/stm32h753zi.pdf (PD5/PD6 na tabela 8) e https://www.st.com/resource/en/application_note/an4899-stm32-microcontroller-gpio-hardware-settings-and-lowpower-consumption-stmicroelectronics.pdf (UART e entradas FT).
 
 ## Configurar no indicador
 
