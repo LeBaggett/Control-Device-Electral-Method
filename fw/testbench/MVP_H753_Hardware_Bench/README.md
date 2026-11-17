@@ -1,6 +1,6 @@
 # Testbench MVP H753 - etapa 2: Ethernet + N1040i / RS485
 
-Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, HAL/CMSIS/LwIP/PHY com versões fixadas e metadados de projeto CubeIDE. **Acesso HTTP da etapa anterior confirmado pelo usuário na placa após corrigir o callback de cache Ethernet. A nova integração N1040i foi compilada/testada no computador; validação física da serial pendente.**
+Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, HAL/CMSIS/LwIP/PHY com versões fixadas e metadados de projeto CubeIDE. **Acesso HTTP da etapa anterior confirmado pelo usuário na placa após corrigir o callback de cache Ethernet. Na versão 0.2.3-n1040i, comunicação e leitura real de um N1040i em paralelo à Ethernet foram confirmadas pelo usuário em 2026-11-17, após substituir jumpers defeituosos. Testes prolongados e três indicadores ainda pendentes.**
 
 Leia primeiro [INTEGRACAO_N1040I.md](INTEGRACAO_N1040I.md) para ligação, configuração, estratégia, diagnósticos e roteiro de bancada.
 

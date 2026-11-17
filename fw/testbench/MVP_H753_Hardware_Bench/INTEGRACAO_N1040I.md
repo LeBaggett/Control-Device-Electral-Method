@@ -126,7 +126,7 @@ Falha UART não é automaticamente defeito no transceptor; as mensagens indicam 
 
 `python Application/tests/run_tests.py`: regressão HTTP/LwIP, buffers independentes, comprimento/JSON, falha de alocação, contadores e invariantes de potência/cache.
 
-Compilação ARM do firmware foi executada. **Conexão elétrica, troca de direção, recepção DMA e leituras reais do N1040i ainda dependem dos testes acima na bancada.**
+Compilação ARM do firmware foi executada. **Em 2026-11-17, o usuário confirmou leitura real de um N1040i com o módulo automático e Ethernet simultânea após substituir jumpers defeituosos. As capturas mostram PV igual ao display e leituras válidas. Isso não encerra os testes prolongados, falhas de sensor, reconexão ou três nós.** Consulte VALIDACAO.md para o registro e os limites.
 
 ## Fontes
 
