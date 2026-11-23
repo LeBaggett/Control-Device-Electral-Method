@@ -20,6 +20,7 @@ with tempfile.TemporaryDirectory(prefix='h753-tests-') as tmp:
 #include <stdio.h>
 #include <string.h>
 int n1040_json(char *out,size_t cap){return snprintf(out,cap,"{}");}
+int hmi_json(char *out,size_t cap){return snprintf(out,cap,"{}");}
 static unsigned allocated,fail_alloc;
 void *mem_malloc(size_t n){if(fail_alloc)return NULL;void*p=malloc(n);if(p)allocated++;return p;}
 void mem_free(void*p){if(p){assert(allocated);allocated--;free(p);}}

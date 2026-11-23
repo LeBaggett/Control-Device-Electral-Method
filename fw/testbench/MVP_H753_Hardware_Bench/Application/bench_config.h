@@ -1,8 +1,19 @@
 #ifndef BENCH_CONFIG_H
 #define BENCH_CONFIG_H
-#define BENCH_VERSION "0.2.5-poll-test"
+#define BENCH_VERSION "0.2.6-hmi-bench"
 /* N1040i menu must match. Parity: 0 none, 1 even, 2 odd (8 data + 1 stop). */
 #define BENCH_N1040_ENABLED 1
+/* Separate IHM bus: Delta master -> STM slave, read-only bench map. */
+#define BENCH_HMI_ENABLED 1U
+#define BENCH_HMI_ADDRESS 1U
+#define BENCH_HMI_BAUD 115200U
+#define BENCH_HMI_PARITY 0U
+#if BENCH_HMI_ENABLED > 1 || BENCH_HMI_ADDRESS < 1 || BENCH_HMI_ADDRESS > 247 || BENCH_HMI_PARITY > 2
+#error "Invalid HMI enable/address/parity"
+#endif
+#if BENCH_HMI_BAUD < 1200U || BENCH_HMI_BAUD > 115200U
+#error "Unsupported HMI baud"
+#endif
 /* 0: automatic-direction module (VCC/TX/RX/GND); 1: PD4 drives DE+/RE. */
 #define BENCH_RS485_MANUAL_DIRECTION 0U
 #if BENCH_RS485_MANUAL_DIRECTION != 0 && BENCH_RS485_MANUAL_DIRECTION != 1

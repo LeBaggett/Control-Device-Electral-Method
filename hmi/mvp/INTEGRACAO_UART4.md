@@ -1,25 +1,21 @@
-# Preparação da IHM Delta DOP-107BV / UART4
+# Integração UART4 — bancada 0.2.6-hmi-bench
 
-## Informação confirmada
+PC10/TX e PC11/RX foram confirmados pelo usuário. O firmware em fw/testbench/MVP_H753_Hardware_Bench implementa UART4, DMA1 Stream1 circular e escravo Modbus RTU endereço 1, 115200 baud, 8N1. A IHM Delta é mestre e o conversor tem direção automática, sem GPIO DE/RE. Os NOVUS permanecem em USART2/DMA1 Stream0, endereços 247/246/245 e perfil rápido validado pelo usuário.
 
-O usuário informou uma IHM DOP-107BV conectada ao STM32 por UART4, usando a cadeia IHM → adaptador DB9/bornes → módulo RS485/TTL (mesmo tipo automático dos NOVUS) → STM32. O adaptador DB9 expõe contatos; o módulo separado converte o sinal. Esse canal é independente do USART2 dos três NOVUS.
+O mapa de 64 palavras e a especificação dos objetos estão em [screens/bench](screens/bench/README.md). FC03 e FC04 leem o mapa; escritas são rejeitadas. Offset 0 = 0xCA15; offset 3 = heartbeat em segundos; temperaturas assinadas em décimos nos offsets 11/21/31, validade em 12/22/32 e unidade em 19/29/39. Consultar o CSV para o mapa completo e conversão 40001/offset 0.
 
-## O que falta confirmar antes de inicializar
+O serviço roda no superloop. IRQs apenas registram eventos e erros; recuperação HAL ocorre no laço principal. Buffers DMA em AXI SRAM, alinhados; D-cache continua desabilitado conforme a política da bancada. Não habilitar cache sem revisar coerência. Não há comandos de atuação ou inicialização de potência nesta integração.
 
-- Quais pinos físicos da NUCLEO estão ligados ao TX e RX da UART4.
-- Qual porta COM da Delta foi usada e quais contatos DB9 estão ligados ao módulo. O desenho do conector deve ser lido pelo lado indicado no manual; não espelhar a numeração por observar o lado oposto.
-- Porta da IHM em RS485 de dois fios, driver Modbus RTU mestre, baud/paridade/stop bits e endereço do STM32 escravo.
-- Projeto DOPSoft e mapa dos objetos. O ZIP fornecido contém artes, fontes e exemplos PNG, não um projeto DOPSoft.
+Diagnóstico: /api/hmi, painel web IHM/UART4, g_hmi_debug e g_hmi_uart_debug. Zero requisições é esperado sem programa mestre na Delta. Bytes recebidos não comprovam frames válidos: comparar requests/responses/CRC e heartbeat na tela. Para desligar o serviço, BENCH_HMI_ENABLED=0 em Application/bench_config.h e recompilar.
 
-UART4 não pode ser inicializada apenas pelo nome do periférico: é necessário confirmar o mapeamento de pinos e conflitos. Por exemplo, PA1 já é usado pelo RMII da Ethernet nesta bancada; não pode ser reaproveitado para UART4 simultaneamente.
+DOPSoft 4.00.16 localizado e aberto. Falta confirmar a porta COM/DB9 cabeada, concluir o projeto nativo, compilar e transferir. Não houve teste físico da UART4, nem transferência para a Delta. Compilação ARM e testes de protocolo/mapa, NOVUS e HTTP passaram no computador. Há aviso preexistente de parâmetro não usado no driver LAN8742 do fornecedor.
 
-## Como começar no DOPSoft
+O ponto anterior confirmado pelo usuário é 63759a5. Backup das fontes substituídas: MVP_before_UART4_20261123.zip no workspace de trabalho. POC preservada.
 
-1. Confirmar a versão do DOPSoft compatível com a DOP-107BV e criar/abrir um projeto para esse modelo, resolução 800×480.
-2. Configurar a porta realmente cabeada como RS485 de dois fios e o driver Modbus RTU mestre apropriado.
-3. Definir endereço/baud/paridade em conjunto com o firmware UART4. Ainda não foi atribuído um endereço ao STM32 neste canal; 247/246/245 pertencem aos indicadores no outro barramento.
-4. Importar um PNG como fundo. Sobrepor objetos nativos para as três temperaturas, validade e comunicação. Botões e entradas precisam de objetos funcionais, não apenas desenhos.
-5. Validar primeiro leitura de um registrador conhecido e heartbeat antes de adicionar comandos. O STM não tem ainda driver escravo UART4 nem mapa publicado: não esperar comunicação apenas por conectar os fios ou importar a imagem.
-6. Após isso, integrar calibração e TSP às mesmas máquinas de estado usadas pelo firmware. Aquisição e segurança permanecem no STM.
+## Cabeamento informado e correção necessária
 
-O diagrama planejado é IHM mestre → canal RS485 dedicado → STM escravo, enquanto STM mestre → outro canal RS485 → três NOVUS escravos. A próxima implementação depende da confirmação física acima.
+O usuário informou COM1 e bornes TXD/RXD. Estes correspondem ao modo RS232, incompatível com a entrada A/B do conversor RS485. Usar COM1 em modo RS485, DB9 pino 1 D+ para A+ e pino 6 D− para B−; conferir numeração pelo lado correto do conector e referência GND pino 5. Não conectar os níveis RS232 diretamente ao TTL da UART4. A correção física ainda não foi confirmada.
+
+Fonte: https://filecenter.deltaww.com/Products/download/06/060302/Manual/DELTA_IA-HMI_DOP-107BV_TC-SC-EN-TUR_20191016.pdf
+
+Build adicional no STM32CubeIDE 1.19.0 Debug: 0 erros, 0 avisos, incluindo os novos arquivos Application e interrupções UART4/DMA1 Stream1. O build CLI com flags adicionais aponta o aviso preexistente do LAN8742 descrito acima. Nenhum firmware foi gravado automaticamente.

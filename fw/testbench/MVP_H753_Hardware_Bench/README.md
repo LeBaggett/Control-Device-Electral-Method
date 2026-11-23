@@ -10,6 +10,12 @@ Versão `0.2.5-poll-test`: consultas N1040i a cada 25 ms quando o canal está li
 
 Para voltar ao ritmo anterior, definir `BENCH_N1040_FAST_POLL = 0` em `Application/bench_config.h`, recompilar e gravar: consultas 250 ms e tela 1000 ms. O ponto anterior completo está no commit `c58b296`. Consulte [TESTE_ATUALIZACAO_RAPIDA.md](TESTE_ATUALIZACAO_RAPIDA.md).
 
+## IHM UART4 — primeira bancada
+
+Versão 0.2.6-hmi-bench: UART4 em PC10/PC11, DMA1 Stream1, escravo Modbus RTU endereço 1 / 115200 / 8N1, mapa somente leitura de 64 palavras. `/api/hmi` e `g_hmi_debug` permitem acompanhar a comunicação. O endereço 1 pertence ao STM no canal dedicado da IHM; os NOVUS 247/246/245 continuam no USART2.
+
+A tela de fundo e a especificação dos objetos ficam em hmi/mvp/screens/bench/. Ainda não há projeto DOPSoft compilado nem transferência física. Instalação do editor e montagem do projeto nativo pendentes.
+
 ## O que está implementado
 
 - Inicialização com HSI + PLL: núcleo 400 MHz, barramento HCLK 200 MHz; SysTick em milissegundos.
@@ -21,7 +27,7 @@ Para voltar ao ritmo anterior, definir `BENCH_N1040_FAST_POLL = 0` em `Applicati
 - Página de diagnóstico e endpoint somente leitura **`GET /api/status`**.
 - Diagnósticos em **`g_bench_debug`**, inclusive erros HAL/DMA e mudança de link.
 
-RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, três indicadores ativos em 247, 246 e 245, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
+RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, três indicadores ativos em 247, 246 e 245, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. O transporte/mapa UART4 da IHM está implementado para teste; o projeto nativo da tela ainda está pendente. ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
 
 ## Estratégia e motivos
 

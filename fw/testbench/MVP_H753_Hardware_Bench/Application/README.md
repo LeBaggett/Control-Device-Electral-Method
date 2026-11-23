@@ -6,6 +6,9 @@
 | bench_diag.c/.h | Estado geral, Ethernet e JSON da API existente |
 | modbus_read.c/.h | CRC16, pedido função 03, validação de resposta, exceção e inteiro assinado |
 | rs485_port.c/.h | USART2, DMA circular RX, direção, silêncio de frame e recuperação; g_rs485_debug |
+| modbus_slave.c/.h | Servidor de leitura FC03/04, limites, CRC, exceções e rejeição de escritas |
+| hmi_uart.c/.h | UART4 PC10/PC11, DMA1 Stream1 e eventos encaminhados pelos callbacks HAL compartilhados |
+| hmi_service.c/.h | Mapa de 64 palavras, snapshots e diagnóstico da IHM; g_hmi_debug |
 | n1040.c/.h | Consultas alternadas de status/PV, round-robin, validade e JSON; g_n1040_debug |
 | board/ | Clock, LEDs e mapa central dos pinos |
 | ui/ | Página em Flash e integração HTTPD |

@@ -1,0 +1,65 @@
+﻿offset_decimal,reference_4xxxx,name,type,scale,access,meaning
+0,40001,signature,uint16,hex,read,0xCA15; usar para confirmar base de endereçamento
+1,40002,map_version,uint16,1,read,Versão 1 do contrato
+2,40003,firmware_minor_patch,uint16,hex,read,0x0206 para versão 0.2.6
+3,40004,uptime_seconds,uint16,1 s,read,Heartbeat; contador de segundos módulo 65536
+4,40005,status_bits,uint16,bits,read,bit0 link Ethernet; bits1..3 canais válidos; bit8 sem driver de potência; bit9 somente leitura
+5,40006,configured_channels,uint16,1,read,Quantidade configurada de NOVUS
+6,40007,valid_channels,uint16,1,read,Quantidade de leituras válidas
+7,40008,novus_uart_errors,uint16,1,read,Contador módulo 65536
+8,40009,hmi_requests,uint16,1,read,Pedidos válidos destinados ao STM; módulo 65536
+9,40010,boot_stage,uint16,1,read,Etapa de inicialização do firmware
+10,40011,novus_247_address,uint16,1,read,Endereço do NOVUS
+11,40012,novus_247_temperature,int16,0.1 grau,read,Complemento de dois; consultar validade e unidade
+12,40013,novus_247_valid,uint16,0/1,read,Não tratar temperatura como atual se zero
+13,40014,novus_247_online,uint16,0/1,read,Estado de comunicação do indicador
+14,40015,novus_247_sensor_status,uint16,bits,read,Status Word 3 bruto do indicador
+15,40016,novus_247_last_error,uint16,1,read,Código do serviço N1040i
+16,40017,novus_247_age_ms,uint16,1 ms,read,Idade do PV; 65535 se ausente ou saturado
+17,40018,novus_247_timeouts,uint16,1,read,Contador módulo 65536
+18,40019,novus_247_responses,uint16,1,read,Contador módulo 65536
+19,40020,novus_247_unit,uint16,0/1,read,"0 Celsius, 1 Fahrenheit"
+20,40021,novus_246_address,uint16,1,read,Endereço do NOVUS
+21,40022,novus_246_temperature,int16,0.1 grau,read,Complemento de dois; consultar validade e unidade
+22,40023,novus_246_valid,uint16,0/1,read,Não tratar temperatura como atual se zero
+23,40024,novus_246_online,uint16,0/1,read,Estado de comunicação do indicador
+24,40025,novus_246_sensor_status,uint16,bits,read,Status Word 3 bruto do indicador
+25,40026,novus_246_last_error,uint16,1,read,Código do serviço N1040i
+26,40027,novus_246_age_ms,uint16,1 ms,read,Idade do PV; 65535 se ausente ou saturado
+27,40028,novus_246_timeouts,uint16,1,read,Contador módulo 65536
+28,40029,novus_246_responses,uint16,1,read,Contador módulo 65536
+29,40030,novus_246_unit,uint16,0/1,read,"0 Celsius, 1 Fahrenheit"
+30,40031,novus_245_address,uint16,1,read,Endereço do NOVUS
+31,40032,novus_245_temperature,int16,0.1 grau,read,Complemento de dois; consultar validade e unidade
+32,40033,novus_245_valid,uint16,0/1,read,Não tratar temperatura como atual se zero
+33,40034,novus_245_online,uint16,0/1,read,Estado de comunicação do indicador
+34,40035,novus_245_sensor_status,uint16,bits,read,Status Word 3 bruto do indicador
+35,40036,novus_245_last_error,uint16,1,read,Código do serviço N1040i
+36,40037,novus_245_age_ms,uint16,1 ms,read,Idade do PV; 65535 se ausente ou saturado
+37,40038,novus_245_timeouts,uint16,1,read,Contador módulo 65536
+38,40039,novus_245_responses,uint16,1,read,Contador módulo 65536
+39,40040,novus_245_unit,uint16,0/1,read,"0 Celsius, 1 Fahrenheit"
+40,40041,novus_poll_ms,uint16,1 ms,read,Intervalo mínimo das consultas
+41,40042,max_loop_gap_ms,uint16,1 ms,read,Maior intervalo do laço; módulo 65536
+42,40043,hmi_uart_last_error,uint16,bits,read,Último erro HAL; retido após recuperação
+43,40044,hmi_uart_errors,uint16,1,read,Contador módulo 65536
+44,40045,ethernet_link_changes,uint16,1,read,Contador módulo 65536
+45,40046,fatal_code,uint16,1,read,Último código de falha fatal no boot atual
+46,40047,ethernet_link,uint16,0/1,read,Link físico; não equivale a sessão TCP nem serial da IHM
+47,40048,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+48,40049,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+49,40050,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+50,40051,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+51,40052,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+52,40053,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+53,40054,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+54,40055,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+55,40056,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+56,40057,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+57,40058,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+58,40059,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+59,40060,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+60,40061,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+61,40062,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+62,40063,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+63,40064,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"

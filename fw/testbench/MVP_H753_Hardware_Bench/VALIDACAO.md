@@ -71,3 +71,8 @@ Teste de regressão simula também o indicador 246 ausente e verifica que 247 e 
 ## Perfil rápido experimental — 2026-11-23
 
 Versão 0.2.5-poll-test, consultas de 25 ms e atualização das temperaturas na página com intervalo de 250 ms após cada fetch. Testes em computador cobrem perfis rápido/anterior e respostas lentas sem sobreposição. Confirmação física do novo ritmo pendente. Retorno ao ritmo anterior por BENCH_N1040_FAST_POLL=0; fonte anterior completa c58b296.
+
+
+## Primeira interface IHM — 2026-11-23
+
+O usuário confirmou PC10/PC11 e necessidade de instalar o DOPSoft. Implementados UART4/DMA1 Stream1, escravo somente leitura endereço 1, mapa 64 palavras e diagnóstico web. Criado fundo 800×480 e especificação de objetos nativos. Não há projeto DOPSoft compilado nem transferência/validação da IHM física. As três leituras NOVUS no perfil rápido foram confirmadas pelo usuário antes desta mudança; repetir teste integrado após gravar a nova versão.

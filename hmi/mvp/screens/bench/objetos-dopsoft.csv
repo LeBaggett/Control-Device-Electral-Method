@@ -1,0 +1,13 @@
+﻿name,kind,offset,reference,x,y,w,h,format,condition,notes
+temperatura_247,Numeric Display,11,40012,246,152,147,34,signed16 / 1 casa decimal,mostrar somente se HR[12]=1; senão campo vazio,Fundo transparente; sem borda; fonte 26; alinhamento direita.
+unidade_247,Multistate Indicator,19,40020,403,157,28,25,0=°C; 1=°F,HR[12]=1,Fonte 14; sem imagem de fundo.
+validade_247,Multistate Indicator,12,40013,447,154,296,30,0=SEM LEITURA VÁLIDA; 1=LEITURA VÁLIDA,Sempre visível enquanto COM válido,"Fonte 16; estado 0 âmbar/vermelho, estado 1 verde."
+temperatura_246,Numeric Display,21,40022,246,246,147,34,signed16 / 1 casa decimal,mostrar somente se HR[22]=1; senão campo vazio,Fundo transparente; sem borda; fonte 26; alinhamento direita.
+unidade_246,Multistate Indicator,29,40030,403,251,28,25,0=°C; 1=°F,HR[22]=1,Fonte 14; sem imagem de fundo.
+validade_246,Multistate Indicator,22,40023,447,248,296,30,0=SEM LEITURA VÁLIDA; 1=LEITURA VÁLIDA,Sempre visível enquanto COM válido,"Fonte 16; estado 0 âmbar/vermelho, estado 1 verde."
+temperatura_245,Numeric Display,31,40032,246,340,147,34,signed16 / 1 casa decimal,mostrar somente se HR[32]=1; senão campo vazio,Fundo transparente; sem borda; fonte 26; alinhamento direita.
+unidade_245,Multistate Indicator,39,40040,403,345,28,25,0=°C; 1=°F,HR[32]=1,Fonte 14; sem imagem de fundo.
+validade_245,Multistate Indicator,32,40033,447,342,296,30,0=SEM LEITURA VÁLIDA; 1=LEITURA VÁLIDA,Sempre visível enquanto COM válido,"Fonte 16; estado 0 âmbar/vermelho, estado 1 verde."
+ethernet,Multistate Indicator,46,40047,117,418,120,25,0=SEM LINK; 1=LINK ATIVO,Sempre visível enquanto COM válido,Não equivale ao estado da serial da IHM.
+canais_validos,Numeric Display,6,40007,330,418,42,25,unsigned16 / 0 casas,COM válido,Valor 0..3.
+uptime_heartbeat,Numeric Display,3,40004,545,418,100,25,unsigned16 / 0 casas,COM válido,Incrementa a cada segundo; retorna a zero a cada 65536 segundos.

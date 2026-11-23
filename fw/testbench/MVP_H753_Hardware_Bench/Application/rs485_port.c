@@ -1,4 +1,5 @@
 #include "rs485_port.h"
+#include "hmi_uart.h"
 #include "bench_config.h"
 #include "pinout.h"
 #include <string.h>
@@ -75,6 +76,7 @@ void rs485_init(uint32_t now){
  initialized=1;rx_error=!arm_rx();retry_at=now;
 }
 void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *h,uint16_t size){
+ hmi_uart_rx_event(h,size);
  if(h!=&g_rs485_uart)return;
  uint16_t pos=(uint16_t)(size%sizeof(dma_rx));
  uint16_t delta=(uint16_t)((pos+sizeof(dma_rx)-last_pos)%sizeof(dma_rx));
@@ -82,11 +84,13 @@ void HAL_UARTEx_RxEventCallback(UART_HandleTypeDef *h,uint16_t size){
   last_cycles=DWT->CYCCNT;last_ms=HAL_GetTick();g_rs485_debug.rx_events++;}
 }
 void HAL_UART_TxCpltCallback(UART_HandleTypeDef *h){
+ hmi_uart_tx_complete(h);
  if(h!=&g_rs485_uart)return;
  /* HAL invokes this on UART TC: last stop bit has left the wire, not just DMA. */
  direction(0);last_cycles=DWT->CYCCNT;last_ms=HAL_GetTick();transmitting=0;
 }
 void HAL_UART_ErrorCallback(UART_HandleTypeDef *h){
+ hmi_uart_error(h);
  if(h!=&g_rs485_uart)return;
  g_rs485_debug.uart_error=h->ErrorCode;g_rs485_debug.uart_errors++;rx_error=1;
  direction(0);transmitting=0;

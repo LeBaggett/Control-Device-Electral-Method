@@ -1,18 +1,10 @@
 # IHM Delta DOP-107BV
 
-Destino do projeto DOPSoft, telas e mapa de comunicação com o STM32.
+Integração da IHM no MVP STM32H753. A bancada 0.2.6-hmi-bench implementa escravo Modbus RTU pela UART4 em PC10/TX e PC11/RX, endereço 1, 115200/8N1, recepção DMA circular. Tela inicial somente leitura: três NOVUS, validade, unidade, Ethernet e heartbeat.
 
-Estado em 2026-11-23: UART4 informada pelo usuário para a IHM; integração de firmware ainda não habilitada. Artes React/TypeScript recebidas e preservadas em artwork/reference/. Não há projeto DOPSoft no ZIP.
+- [Integração e limites](INTEGRACAO_UART4.md): firmware, pinos, diagnóstico e validação pendente.
+- [Tela de bancada](screens/bench/README.md): fundo 800×480, objetos e mapa completo de registradores.
+- [Artes originais](artwork/README.md): referência React/TypeScript fornecida, preservada.
+- [Protocolo](protocol/README.md): responsabilidades do canal.
 
-A IHM possui interfaces seriais; não presumir Ethernet neste modelo. Criar telas de operação, três temperaturas, calibração, TSP, estados e alarmes. Confirmar driver/protocolo no DOPSoft antes de definir registradores finais.
-
-## Subpastas
-
-- [protocol](protocol/README.md)
-- [screens](screens/README.md)
-- [artwork](artwork/README.md)
-- [Integração inicial](INTEGRACAO_UART4.md)
-
-## Manutenção
-
-Implementações futuras devem manter as responsabilidades desta camada e atualizar este README com os arquivos efetivamente criados. Arquivos de outras gerações não devem ser copiados sem revisão de interfaces e premissas.
+DOPSoft 4.00.16 instalado. Projeto nativo ainda em montagem; os PNG/CSV/JSON são arte e especificação, não um programa já transferido à Delta. A UART4 ainda precisa de validação física. Os ensaios/calibração e comandos operacionais não fazem parte desta primeira tela de bancada.

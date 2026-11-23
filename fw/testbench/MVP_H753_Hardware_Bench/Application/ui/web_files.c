@@ -2,6 +2,7 @@
 #include "lwip/mem.h"
 #include "bench_diag.h"
 #include "n1040.h"
+#include "hmi_service.h"
 #include "index_html.h"
 #include <stdio.h>
 #include <string.h>
@@ -10,9 +11,9 @@ int fs_open_custom(struct fs_file *file,const char *name) {
  if(strcmp(name,"/index.html")==0 || strcmp(name,"/")==0) {
   g_bench_debug.http_requests++;
   file->data=(const char *)bench_index_http;file->len=sizeof(bench_index_http);
- } else if((strcmp(name,"/api/status")==0 || strcmp(name,"/api/n1040")==0)) {
+ } else if((strcmp(name,"/api/status")==0 || strcmp(name,"/api/n1040")==0 || strcmp(name,"/api/hmi")==0)) {
   g_bench_debug.http_requests++;
-  char body[2560];int length=strcmp(name,"/api/n1040")==0?n1040_json(body,sizeof(body)):bench_diag_json(body,sizeof(body));
+  char body[2560];int length=strcmp(name,"/api/n1040")==0?n1040_json(body,sizeof(body)):(strcmp(name,"/api/hmi")==0?hmi_json(body,sizeof(body)):bench_diag_json(body,sizeof(body)));
   if(length<0)return 0;
   char *data=mem_malloc(3072);
   if(!data){g_bench_debug.http_alloc_failures++;return 0;}

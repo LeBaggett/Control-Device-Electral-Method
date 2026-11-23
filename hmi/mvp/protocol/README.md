@@ -1,11 +1,5 @@
-# Contrato IHM/STM32
+# Protocolo da IHM
 
-Mapa de registradores e comandos, escala, endianess, permissões e respostas.
+IHM mestre Modbus RTU, STM32 escravo 1, UART4 PC10/PC11 a 115200/8N1 com conversor automático. Canal independente dos NOVUS. A implementação da bancada é somente leitura FC03/FC04, sem comandos de potência.
 
-Estado: estrutura inicial criada em 26/10/2026.
-
-Registrar unidade e versão do protocolo. Comando rejeitado deve apresentar motivo; não escrever diretamente em GPIO.
-
-## Manutenção
-
-Implementações futuras devem manter as responsabilidades desta camada e atualizar este README com os arquivos efetivamente criados. Arquivos de outras gerações não devem ser copiados sem revisão de interfaces e premissas.
+Mapa canônico: [holding-registers.csv](../screens/bench/holding-registers.csv). Objetos e convenção de endereços: [tela de bancada](../screens/bench/README.md). Código em Application/hmi_service.c, modbus_slave.c e hmi_uart.c da MVP_H753_Hardware_Bench. Modificações no mapa exigem versionamento e atualização conjunta da tela.
