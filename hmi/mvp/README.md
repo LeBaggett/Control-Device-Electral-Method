@@ -2,7 +2,7 @@
 
 Destino do projeto DOPSoft, telas e mapa de comunicação com o STM32.
 
-Estado: estrutura inicial criada em 26/10/2026.
+Estado em 2026-11-23: UART4 informada pelo usuário para a IHM; integração de firmware ainda não habilitada. Artes React/TypeScript recebidas e preservadas em artwork/reference/. Não há projeto DOPSoft no ZIP.
 
 A IHM possui interfaces seriais; não presumir Ethernet neste modelo. Criar telas de operação, três temperaturas, calibração, TSP, estados e alarmes. Confirmar driver/protocolo no DOPSoft antes de definir registradores finais.
 
@@ -10,6 +10,8 @@ A IHM possui interfaces seriais; não presumir Ethernet neste modelo. Criar tela
 
 - [protocol](protocol/README.md)
 - [screens](screens/README.md)
+- [artwork](artwork/README.md)
+- [Integração inicial](INTEGRACAO_UART4.md)
 
 ## Manutenção
 

@@ -59,3 +59,10 @@ Versão do firmware: **0.2.3-n1040i**, fontes no commit **fa68e77**. O usuário 
 - Esta é uma baseline funcional com **um instrumento**. Não equivale a validação de 30 minutos, teste de reconexão, sensor desconectado ou três indicadores. A sequência reservada continua 247, 246, 245, com count=1 neste firmware.
 
 Nenhuma alteração executável foi necessária para registrar este resultado; este commit atualiza a evidência de bancada e preserva a versão confirmada pelo usuário.
+
+
+## Três canais habilitados — 2026-11-23
+
+Versão 0.2.4-three-n1040i: count=3, consultas em ordem 247, 246, 245. O código anterior consultava apenas 247, pois count=1 era deliberado durante a validação inicial. A página distingue quantidade configurada de leituras válidas; não faz descoberta automática.
+
+Teste de regressão simula também o indicador 246 ausente e verifica que 247 e 245 continuam atendidos. Esse teste não substitui a verificação da bancada com os três equipamentos físicos. UART4/IHM ainda não é inicializada: falta confirmar pinos na NUCLEO e parâmetros/projeto DOPSoft. A cadeia física informada pelo usuário é IHM → DB9/bornes → módulo RS485/TTL independente → UART4.

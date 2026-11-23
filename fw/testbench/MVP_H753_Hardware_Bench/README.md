@@ -15,7 +15,7 @@ Leia primeiro [INTEGRACAO_N1040I.md](INTEGRACAO_N1040I.md) para ligação, confi
 - Página de diagnóstico e endpoint somente leitura **`GET /api/status`**.
 - Diagnósticos em **`g_bench_debug`**, inclusive erros HAL/DMA e mudança de link.
 
-RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, um indicador ativo inicialmente em 247, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
+RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, três indicadores ativos em 247, 246 e 245, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. IHM, ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
 
 ## Estratégia e motivos
 
@@ -81,6 +81,6 @@ Esperados: boot_stage 5 (aplicação/servidor iniciados), fatal_code 0, core_hz 
 
 ## Critérios e limites
 
-Consulte [VALIDACAO.md](VALIDACAO.md). A etapa atual adiciona RS485/N1040i, mantendo a Ethernet. Validar primeiro um indicador, depois três. Em seguida vem aquisição de tensão conhecida, e só então teste simultâneo das três interfaces.
+Consulte [VALIDACAO.md](VALIDACAO.md). A etapa atual adiciona RS485/N1040i, mantendo a Ethernet. Um indicador teve funcionamento confirmado pelo usuário; a versão atual habilita três para validação conjunta. Em seguida vem aquisição de tensão conhecida, e só então teste simultâneo das três interfaces.
 
 Referências: [UM2407](https://www.st.com/resource/en/user_manual/um2407-stm32h7-nucleo144-boards-mb1364-stmicroelectronics.pdf) e exemplo oficial [LwIP HTTP Raw da ST](https://github.com/STMicroelectronics/STM32CubeH7/tree/master/Projects/STM32H743I-EVAL/Applications/LwIP/LwIP_HTTP_Server_Raw). O ethernetif foi adaptado; não é o exemplo EVAL sem alterações.

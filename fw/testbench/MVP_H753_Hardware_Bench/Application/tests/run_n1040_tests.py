@@ -53,6 +53,19 @@ int main(void){
   assert(g_n1040_debug.node[i].valid && g_n1040_debug.node[i].pv_tenths==298);
  }
  char out[2560];assert(n1040_json(out,sizeof(out))>0);puts(out);
+ if(BENCH_N1040_COUNT==3){
+  /* A missing middle slave must not starve the other two on the bus. */
+  n1040_init(0);n1040_step(250);respond(status,5,260);
+  n1040_step(500);respond(pv,1,510);
+  n1040_step(750);assert(request[0]==246);n1040_step(1150);
+  assert(request[0]==246 && request[3]==1);n1040_step(1550);
+  assert(request[0]==245 && request[3]==6);respond(status,5,1560);
+  n1040_step(1800);respond(pv,1,1810);
+  assert(g_n1040_debug.node[0].valid && !g_n1040_debug.node[1].valid && g_n1040_debug.node[2].valid);
+  assert(g_n1040_debug.node[1].timeouts==2);
+  n1040_step(2050);assert(request[0]==247);respond(status,5,2060);
+  n1040_step(2300);respond(pv,1,2310);assert(g_n1040_debug.node[0].responses==4);
+ }
  char tiny[8];assert(n1040_json(tiny,sizeof(tiny))==-1 && tiny[0]==0);assert(n1040_json(NULL,0)==-1);
  n1040_init(0);n1040_step(250);uint16_t sensor[]={0,200,68,0,4};respond(sensor,5,260);
  n1040_step(500);respond(pv,1,510);assert(!g_n1040_debug.node[0].valid && g_n1040_debug.node[0].status3==4);
@@ -90,7 +103,7 @@ int main(void){
 with tempfile.TemporaryDirectory(prefix='n1040-tests-') as td:
  d=Path(td)
  for nodes in (1,3):
-  config=(root/'Application/bench_config.h').read_text().replace('#define BENCH_N1040_COUNT 1U',f'#define BENCH_N1040_COUNT {nodes}U')
+  config=re.sub(r'#define BENCH_N1040_COUNT \d+U',f'#define BENCH_N1040_COUNT {nodes}U',(root/'Application/bench_config.h').read_text())
   (d/'bench_config.h').write_text(config)
   (d/'n1040.c').write_text((root/'Application/n1040.c').read_text())
   (d/'test.c').write_text(harness)

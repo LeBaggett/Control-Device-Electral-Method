@@ -2,7 +2,7 @@
 
 ## O que foi preparado
 
-Firmware `0.2.3-n1040i`, na mesma bancada Ethernet. Primeiro conectar **um N1040i com RS485**, endereço 247. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
+Firmware `0.2.4-three-n1040i`, na mesma bancada Ethernet. Consultas habilitadas para **três N1040i com RS485**, endereços 247, 246 e 245. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
 
 O servidor continua em `http://192.168.7.2/`. O painel N1040i consulta `GET /api/n1040`; a API anterior `/api/status` continua disponível. A página é incorporada na Flash com o firmware.
 
@@ -88,7 +88,7 @@ Sem módulo/instrumento conectado, timeouts são esperados e não devem acender 
 | `g_n1040_debug` | Diagnóstico completo do protocolo, `node[0]` é o primeiro indicador |
 | `g_rs485_debug` | Inicialização UART/DMA, bytes, erros, reinícios e direção |
 
-Padrão: uma requisição a cada 250 ms, timeout 400 ms, validade máxima 5 s. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). Um instrumento atualiza PV aproximadamente a cada 500 ms com respostas rápidas. Para três, configurar `BENCH_N1040_COUNT = 3` e endereços exclusivos 247, 246, 245, nesta ordem decrescente; ciclo nominal por instrumento aproximadamente 1,5 s. Testes de três nós foram feitos em simulação, ainda não fisicamente.
+Padrão: uma requisição a cada 250 ms, timeout 400 ms, validade máxima 5 s. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). Um instrumento atualiza PV aproximadamente a cada 500 ms com respostas rápidas. A configuração atual é `BENCH_N1040_COUNT = 3`, com endereços exclusivos 247, 246, 245, nesta ordem decrescente; ciclo nominal por instrumento aproximadamente 1,5 s. Testes de três nós e de um nó ausente foram feitos em simulação; confirmação física conjunta ainda pendente. A quantidade na página representa canais configurados, não detecção automática. Cada cartão e o total de leituras válidas mostram quais respondem com medição válida.
 
 ## Diagnóstico e causas possíveis
 
