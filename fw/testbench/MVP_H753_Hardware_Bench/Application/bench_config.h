@@ -1,6 +1,6 @@
 #ifndef BENCH_CONFIG_H
 #define BENCH_CONFIG_H
-#define BENCH_VERSION "0.2.4-three-n1040i"
+#define BENCH_VERSION "0.2.5-poll-test"
 /* N1040i menu must match. Parity: 0 none, 1 even, 2 odd (8 data + 1 stop). */
 #define BENCH_N1040_ENABLED 1
 /* 0: automatic-direction module (VCC/TX/RX/GND); 1: PD4 drives DE+/RE. */
@@ -14,7 +14,18 @@
 #define BENCH_N1040_ADDR1 247U
 #define BENCH_N1040_ADDR2 246U
 #define BENCH_N1040_ADDR3 245U
+/* Bench experiment: set 0 and rebuild/flash to restore the prior cadence.
+ * Stable pre-experiment source: c58b296. UART baud and safety limits unchanged. */
+#define BENCH_N1040_FAST_POLL 1U
+#if BENCH_N1040_FAST_POLL == 1
+#define BENCH_N1040_POLL_MS 25U
+#define BENCH_N1040_WEB_REFRESH_MS 250U
+#elif BENCH_N1040_FAST_POLL == 0
 #define BENCH_N1040_POLL_MS 250U
+#define BENCH_N1040_WEB_REFRESH_MS 1000U
+#else
+#error "BENCH_N1040_FAST_POLL must be 0 or 1"
+#endif
 #define BENCH_N1040_TIMEOUT_MS 400U
 #define BENCH_N1040_STALE_MS 5000U
 #if BENCH_N1040_COUNT < 1 || BENCH_N1040_COUNT > 3 || BENCH_RS485_PARITY > 2

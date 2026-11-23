@@ -4,6 +4,12 @@ Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, 
 
 Leia primeiro [INTEGRACAO_N1040I.md](INTEGRACAO_N1040I.md) para ligação, configuração, estratégia, diagnósticos e roteiro de bancada.
 
+## Experimento de atualização rápida
+
+Versão `0.2.5-poll-test`: consultas N1040i a cada 25 ms quando o canal está livre, tela de temperaturas 250 ms após cada resposta HTTP. Uma transação por vez, com o timeout anterior de 400 ms. O ciclo dos três tem estimativa de 150 ms apenas se cada resposta terminar a tempo; isso não sincroniza as conversões dos indicadores. A frequência ainda depende de validação na placa.
+
+Para voltar ao ritmo anterior, definir `BENCH_N1040_FAST_POLL = 0` em `Application/bench_config.h`, recompilar e gravar: consultas 250 ms e tela 1000 ms. O ponto anterior completo está no commit `c58b296`. Consulte [TESTE_ATUALIZACAO_RAPIDA.md](TESTE_ATUALIZACAO_RAPIDA.md).
+
 ## O que está implementado
 
 - Inicialização com HSI + PLL: núcleo 400 MHz, barramento HCLK 200 MHz; SysTick em milissegundos.

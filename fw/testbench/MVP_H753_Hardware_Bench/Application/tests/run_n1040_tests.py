@@ -18,7 +18,7 @@ static uint8_t incoming[64],request[8];static size_t incoming_size;static int bl
 void rs485_init(uint32_t now){(void)now;memset((void*)&g_rs485_debug,0,sizeof(g_rs485_debug));incoming_size=0;blocked=0;}
 void rs485_step(uint32_t now){(void)now;}
 int rs485_busy(void){return blocked;}
-int rs485_send(const uint8_t*d,size_t n){assert(n==8);assert(d[1]==3);memcpy(request,d,n);return 1;}
+int rs485_send(const uint8_t*d,size_t n){assert(n==8);assert(d[1]==3);assert(!g_n1040_debug.waiting);memcpy(request,d,n);return 1;}
 size_t rs485_take_frame(uint8_t*d,size_t n){assert(n>=incoming_size);size_t len=incoming_size;memcpy(d,incoming,len);incoming_size=0;return len;}
 static void crc(uint8_t*b,size_t n){uint16_t c=mb_crc16(b,n);b[n]=(uint8_t)c;b[n+1]=(uint8_t)(c>>8);}
 static void respond(const uint16_t*w,unsigned count,uint32_t now){
@@ -66,6 +66,22 @@ int main(void){
   n1040_step(2050);assert(request[0]==247);respond(status,5,2060);
   n1040_step(2300);respond(pv,1,2310);assert(g_n1040_debug.node[0].responses==4);
  }
+ /* Check actual configured cadence, not only coarse 250-ms test steps. */
+ const uint32_t period=BENCH_N1040_POLL_MS;
+ n1040_init(0);n1040_step(period-1);assert(g_n1040_debug.requests==0);
+ for(unsigned i=0;i<BENCH_N1040_COUNT;i++){
+  uint32_t t=(2*i+1)*period;n1040_step(t);
+  assert(request[0]==247-i && request[3]==6);respond(status,5,t+1);
+  n1040_step(t+period-1);assert(g_n1040_debug.requests==2*i+1);
+  n1040_step(t+period);assert(request[3]==1);respond(pv,1,t+period+1);
+  assert(g_n1040_debug.node[i].valid);
+ }
+ assert(g_n1040_debug.requests==2*BENCH_N1040_COUNT);
+ /* A slow reply must keep its transaction exclusive across poll deadlines. */
+ n1040_init(0);n1040_step(period);n1040_step(2*period);
+ assert(g_n1040_debug.requests==1 && g_n1040_debug.waiting);
+ respond(status,5,2*period+1);assert(g_n1040_debug.requests==2);
+ respond(pv,1,2*period+2);assert(g_n1040_debug.node[0].valid);
  char tiny[8];assert(n1040_json(tiny,sizeof(tiny))==-1 && tiny[0]==0);assert(n1040_json(NULL,0)==-1);
  n1040_init(0);n1040_step(250);uint16_t sensor[]={0,200,68,0,4};respond(sensor,5,260);
  n1040_step(500);respond(pv,1,510);assert(!g_n1040_debug.node[0].valid && g_n1040_debug.node[0].status3==4);
@@ -102,8 +118,9 @@ int main(void){
 '''
 with tempfile.TemporaryDirectory(prefix='n1040-tests-') as td:
  d=Path(td)
- for nodes in (1,3):
+ for nodes,fast in ((1,0),(3,0),(1,1),(3,1)):
   config=re.sub(r'#define BENCH_N1040_COUNT \d+U',f'#define BENCH_N1040_COUNT {nodes}U',(root/'Application/bench_config.h').read_text())
+  config=config.replace('#define BENCH_N1040_FAST_POLL 1U',f'#define BENCH_N1040_FAST_POLL {fast}U')
   (d/'bench_config.h').write_text(config)
   (d/'n1040.c').write_text((root/'Application/n1040.c').read_text())
   (d/'test.c').write_text(harness)
@@ -115,9 +132,12 @@ with tempfile.TemporaryDirectory(prefix='n1040-tests-') as td:
   assert result['count']==nodes and len(result['nodes'])==nodes
   assert result['baud']==115200 and result['parity']==0
   assert result['direction']=='auto'
+  assert result['poll_ms']==(25 if fast else 250)
+  assert result['web_refresh_ms']==(250 if fast else 1000)
+  assert result['poll_profile']==('fast-test' if fast else 'previous')
   assert [n['address'] for n in result['nodes']]==[247,246,245][:nodes]
   assert all(n['valid'] and n['pv_tenths']==298 for n in result['nodes'])
-  print(f'PASS: {nodes} node(s): real codec/scheduler, CRC, signed PV, status, ID, Fahrenheit, exceptions, timeout, UART error, stale data, wrap, JSON')
+  print(f'PASS: {nodes} node(s), fast={fast}: real codec/scheduler, CRC, signed PV, status, ID, Fahrenheit, exceptions, timeout, UART error, stale data, wrap, JSON, cadence and exclusive slow responses')
  html=(root/'Application/ui/index.html').read_text(encoding='utf-8')
  js=re.search(r'<script>(.*?)</script>',html,re.S).group(1)
  (d/'web.js').write_text(js,encoding='utf-8')

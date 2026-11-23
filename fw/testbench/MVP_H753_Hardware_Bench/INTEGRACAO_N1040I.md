@@ -2,7 +2,7 @@
 
 ## O que foi preparado
 
-Firmware `0.2.4-three-n1040i`, na mesma bancada Ethernet. Consultas habilitadas para **três N1040i com RS485**, endereços 247, 246 e 245. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
+Firmware `0.2.5-poll-test`, na mesma bancada Ethernet. Consultas habilitadas para **três N1040i com RS485**, endereços 247, 246 e 245. Leitura de PV, identificação, versão e estados; nenhuma escrita de configuração, acionamento de saída ou controle de aquecimento.
 
 O servidor continua em `http://192.168.7.2/`. O painel N1040i consulta `GET /api/n1040`; a API anterior `/api/status` continua disponível. A página é incorporada na Flash com o firmware.
 
@@ -88,7 +88,7 @@ Sem módulo/instrumento conectado, timeouts são esperados e não devem acender 
 | `g_n1040_debug` | Diagnóstico completo do protocolo, `node[0]` é o primeiro indicador |
 | `g_rs485_debug` | Inicialização UART/DMA, bytes, erros, reinícios e direção |
 
-Padrão: uma requisição a cada 250 ms, timeout 400 ms, validade máxima 5 s. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). Um instrumento atualiza PV aproximadamente a cada 500 ms com respostas rápidas. A configuração atual é `BENCH_N1040_COUNT = 3`, com endereços exclusivos 247, 246, 245, nesta ordem decrescente; ciclo nominal por instrumento aproximadamente 1,5 s. Testes de três nós e de um nó ausente foram feitos em simulação; confirmação física conjunta ainda pendente. A quantidade na página representa canais configurados, não detecção automática. Cada cartão e o total de leituras válidas mostram quais respondem com medição válida.
+Perfil experimental ativo: uma requisição a cada 25 ms quando a anterior terminou, timeout 400 ms, validade máxima 5 s. O perfil anterior de 250 ms continua selecionável pelo header. Dois pedidos alternados por instrumento: registrador 6, quantidade 5 (status/versão/ID), e registrador 1, quantidade 1 (PV). No perfil experimental, um instrumento pode atualizar PV aproximadamente a cada 50 ms com respostas rápidas; no perfil anterior, 500 ms. A configuração atual é `BENCH_N1040_COUNT = 3`, com endereços exclusivos 247, 246, 245, nesta ordem decrescente; ciclo estimado por instrumento de 150 ms no experimento, se as respostas e o processamento couberem nos intervalos, ou 1,5 s no perfil anterior. Testes de três nós e de um nó ausente foram feitos em simulação; confirmação física conjunta ainda pendente. A quantidade na página representa canais configurados, não detecção automática. Cada cartão e o total de leituras válidas mostram quais respondem com medição válida.
 
 ## Diagnóstico e causas possíveis
 
