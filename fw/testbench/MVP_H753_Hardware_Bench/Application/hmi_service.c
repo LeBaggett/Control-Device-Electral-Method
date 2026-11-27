@@ -12,7 +12,7 @@ static uint16_t registers[HMI_REGISTER_COUNT];
 static uint16_t saturated_age(unsigned seen,uint32_t age){return !seen || age>65535U?65535U:(uint16_t)age;}
 void hmi_register_snapshot(uint16_t r[HMI_REGISTER_COUNT],uint32_t now){
  memset(r,0,HMI_REGISTER_COUNT*sizeof(*r));
- r[0]=0xca15;r[1]=1;r[2]=0x0207;r[3]=(uint16_t)(now/1000U);
+ r[0]=0xca15;r[1]=1;r[2]=0x0208;r[3]=(uint16_t)(now/1000U);
  r[4]=(uint16_t)(g_bench_debug.link_up?1U:0U);r[4]|=0x0300U; /* Power blocked, read-only bench. */
  r[5]=(uint16_t)g_n1040_debug.count;r[7]=(uint16_t)g_rs485_debug.uart_errors;
  r[8]=(uint16_t)g_hmi_debug.requests;r[9]=(uint16_t)g_bench_debug.boot_stage;

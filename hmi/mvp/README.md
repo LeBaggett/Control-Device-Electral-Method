@@ -1,6 +1,6 @@
 # IHM Delta DOP-107BV
 
-Integração da IHM no MVP STM32H753. A bancada 0.2.6-hmi-bench implementa escravo Modbus RTU pela UART4 em PD1/TX e PD0/RX, endereço 1, 115200/8N1, recepção DMA circular. Tela inicial somente leitura: três NOVUS, validade, unidade, Ethernet e heartbeat.
+Integração da IHM no MVP STM32H753. A bancada 0.2.8-hmi-9600 implementa escravo Modbus RTU pela UART4 em PD1/TX e PD0/RX, endereço 1, 9600/8N1, recepção DMA circular. Tela inicial somente leitura: três NOVUS, validade, unidade, Ethernet e heartbeat.
 
 - [Integração e limites](INTEGRACAO_UART4.md): firmware, pinos, diagnóstico e validação pendente.
 - [Tela de bancada](screens/bench/README.md): fundo 800×480, objetos e mapa completo de registradores.

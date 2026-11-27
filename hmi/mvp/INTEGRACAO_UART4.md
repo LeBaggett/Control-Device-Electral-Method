@@ -1,3 +1,5 @@
+> Teste em 2026-11-27: firmware 0.2.8-hmi-9600 reduz somente UART4/Delta para 9600 baud, 8N1, escravo 1, PD1/TX e PD0/RX. USART2/NOVUS permanece a 115200. Alterar COM1 no DOPSoft para 9600, compilar e fazer Download All Data; recompilar e gravar também o STM32. O .dpa não foi alterado automaticamente. Confirmar baud=9600 no /api/hmi e observar contadores após reiniciar. Redução de baud é teste diagnóstico, não comprova correção do ruído. Abaixo, histórico da integração anterior.
+
 > Atualização 2026-11-27: ligação física corrigida pelo usuário para PD0/RX e PD1/TX. Firmware 0.2.7-hmi-pd01 usa GPIOD/AF8 e diagnóstico com os mesmos nomes do pinout.h. O mapeamento anterior PC10/PC11 também existe no MCU, mas não correspondia aos fios instalados. UART4/DMA1 Stream1, endereço 1 e 115200/8N1 preservados. Recompilar e gravar; conferir /api/hmi: tx_pin=PD1 e rx_pin=PD0. Não houve validação física por software nesta entrega.
 >
 > Referência: https://www.st.com/resource/en/datasheet/stm32h753zi.pdf (funções alternativas PD0/PD1).

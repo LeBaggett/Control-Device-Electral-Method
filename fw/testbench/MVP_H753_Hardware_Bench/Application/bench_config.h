@@ -1,12 +1,12 @@
 #ifndef BENCH_CONFIG_H
 #define BENCH_CONFIG_H
-#define BENCH_VERSION "0.2.7-hmi-pd01"
+#define BENCH_VERSION "0.2.8-hmi-9600"
 /* N1040i menu must match. Parity: 0 none, 1 even, 2 odd (8 data + 1 stop). */
 #define BENCH_N1040_ENABLED 1
 /* Separate IHM bus: Delta master -> STM slave, read-only bench map. */
 #define BENCH_HMI_ENABLED 1U
 #define BENCH_HMI_ADDRESS 1U
-#define BENCH_HMI_BAUD 115200U
+#define BENCH_HMI_BAUD 9600U
 #define BENCH_HMI_PARITY 0U
 #if BENCH_HMI_ENABLED > 1 || BENCH_HMI_ADDRESS < 1 || BENCH_HMI_ADDRESS > 247 || BENCH_HMI_PARITY > 2
 #error "Invalid HMI enable/address/parity"
