@@ -1,7 +1,7 @@
 ﻿offset_decimal,reference_4xxxx,name,type,scale,access,meaning
 0,40001,signature,uint16,hex,read,0xCA15; usar para confirmar base de endereçamento
 1,40002,map_version,uint16,1,read,Versão 1 do contrato
-2,40003,firmware_minor_patch,uint16,hex,read,0x0206 para versão 0.2.6
+2,40003,firmware_minor_patch,uint16,hex,read,0x0208 para versão 0.2.8
 3,40004,uptime_seconds,uint16,1 s,read,Heartbeat; contador de segundos módulo 65536
 4,40005,status_bits,uint16,bits,read,bit0 link Ethernet; bits1..3 canais válidos; bit8 sem driver de potência; bit9 somente leitura
 5,40006,configured_channels,uint16,1,read,Quantidade configurada de NOVUS
