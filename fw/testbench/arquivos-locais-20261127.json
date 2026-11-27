@@ -1,0 +1,75 @@
+{
+  "date": "2026-11-27",
+  "files": [
+    {
+      "path": "fw/testbench/Driver_Hardware_Bench/.settings/language.settings.xml",
+      "bytes": 2168,
+      "sha256": "20d1b3b40527bda6f0a520a4f08580abdbd41f06d0f8efe6928d9d68eef3b199"
+    },
+    {
+      "path": "fw/testbench/Driver_Hardware_Bench/.settings/stm32cubeide.project.prefs",
+      "bytes": 165,
+      "sha256": "fca30f6497ac3135f02a8d59259ed901e0c49007277a92cae61575a97781c7b1"
+    },
+    {
+      "path": "fw/testbench/MVP_H753_Hardware_Bench/.settings/language.settings.xml",
+      "bytes": 2168,
+      "sha256": "a646fddec973a8730c7672efab0d27b7e7cc862d0f6a9295bf343395506d1cdd"
+    },
+    {
+      "path": "fw/testbench/MVP_H753_Hardware_Bench/.settings/stm32cubeide.project.prefs",
+      "bytes": 232,
+      "sha256": "c9682aa1e82c0dee3bb91ffa61e2c9d935ead5429f0742a5d901714601f7d81a"
+    },
+    {
+      "path": "fw/testbench/MVP_H753_Hardware_Bench/MVP_H753_Hardware_Bench.launch",
+      "bytes": 9728,
+      "sha256": "c3877b3fddd361ba66a427a1f8f507003ddf2cc208969743848125880025f35e"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/.settings/language.settings.xml",
+      "bytes": 2168,
+      "sha256": "20d1b3b40527bda6f0a520a4f08580abdbd41f06d0f8efe6928d9d68eef3b199"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/.settings/stm32cubeide.project.prefs",
+      "bytes": 165,
+      "sha256": "1609cb801ef9988a8e8f72cf3b7daf38f96a33c2e11d8408baad1fc8068ce50e"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/firmware/OLED_Only_F407.bin",
+      "bytes": 6812,
+      "sha256": "5c197871b50677a3e091be9ffd39eae253bc6bba582df7aa4caf31d7992d78a5"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/firmware/OLED_Only_F407.elf",
+      "bytes": 1165668,
+      "sha256": "e614e6ffc15a4f8224fe18403b70e8d649b76ceb19bc1bab10368e9672e19b46"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/firmware/OLED_Only_F407.map",
+      "bytes": 854734,
+      "sha256": "4f73ce9ba86dc3026b6158c6e1a112a42c46fa6ba6ef4d571c492bee59c10e23"
+    },
+    {
+      "path": "fw/testbench/Driver_Hardware_Bench/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs",
+      "bytes": 115,
+      "sha256": "a6188e0ff8e84f1ae480f614d33af1da46c360359ee8c6e29a97b521c1331b7f"
+    },
+    {
+      "path": "fw/testbench/MVP_H753_Hardware_Bench/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs",
+      "bytes": 115,
+      "sha256": "a6188e0ff8e84f1ae480f614d33af1da46c360359ee8c6e29a97b521c1331b7f"
+    },
+    {
+      "path": "fw/testbench/OLED_Only_F407/.settings/com.st.stm32cube.ide.mcu.sfrview.prefs",
+      "bytes": 115,
+      "sha256": "a6188e0ff8e84f1ae480f614d33af1da46c360359ee8c6e29a97b521c1331b7f"
+    },
+    {
+      "path": "hmi/mvp/dopsoft/CAIS_MVP_Bancada.dpa",
+      "bytes": 135440,
+      "sha256": "fbd57030c1914c9e92606416bbad910be0fac16beb95e27ae2a24cb4872645da"
+    }
+  ]
+}

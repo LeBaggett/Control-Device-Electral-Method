@@ -1,19 +1,11 @@
-# firmware - guia de manutenção
+# Artefatos locais — OLED Only F407
 
-Estrutura auxiliar/legada de testes. O projeto ativo é Core + Application + FATFS + Drivers + Middlewares; conferir .cproject antes de adicionar fontes desta pasta ao build.
+Arquivos binários preexistentes incluídos no versionamento a pedido do usuário em 2026-11-27. Não foram reconstruídos nesta organização; a correspondência exata com os fontes atuais não foi verificada.
 
-Documentação revisada em 26/10/2026. Os comentários e guias não alteram a lógica executável.
-
-## Arquivos e implementações
-
-| Arquivo | Responsabilidade e manutenção |
+| Arquivo | Conteúdo |
 |---|---|
-| [OLED_Only_F407.bin](OLED_Only_F407.bin) | Recurso visual/binário; conferir consumidor, dimensões e formato antes de substituir. |
-| [OLED_Only_F407.elf](OLED_Only_F407.elf) | Arquivo de suporte OLED_Only_F407.elf; identificar seu consumidor antes de modificar ou remover. |
-| [OLED_Only_F407.map](OLED_Only_F407.map) | Arquivo de suporte OLED_Only_F407.map; identificar seu consumidor antes de modificar ou remover. |
+| `OLED_Only_F407.bin` | Imagem binária do firmware do teste OLED F407; não é uma imagem de tela |
+| `OLED_Only_F407.elf` | Executável com seções, símbolos e informações para depuração |
+| `OLED_Only_F407.map` | Mapa produzido pelo linker, com endereços e ocupação de memória |
 
-## Observações para manutenção
-
-Antes de alterar interfaces, procure seus consumidores e testes. Após mudanças, revise o diff e compile o projeto correspondente; confirme em bancada quando houver efeito elétrico ou temporal.
-
-[Voltar à pasta superior](../README.md)
+São referências históricas do teste F407; não são o firmware da NUCLEO-H753ZI. Para uma gravação a partir dos fontes atuais, compilar o projeto correspondente. Hashes e inventário em [ARQUIVOS_LOCAIS_VERSIONADOS.md](../../ARQUIVOS_LOCAIS_VERSIONADOS.md).
