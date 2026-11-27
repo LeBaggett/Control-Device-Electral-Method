@@ -2,7 +2,7 @@
 
 ## Estado da entrega
 
-Firmware 0.2.6-hmi-bench preparado para IHM mestre Modbus RTU, STM32 escravo endereço 1, 115200 baud, 8N1. PC10/TX e PC11/RX confirmados pelo usuário. O módulo RS485/TTL é separado do usado pelos NOVUS e tem direção automática. UART4 usa DMA1 Stream1; os NOVUS continuam em USART2/DMA1 Stream0. Ethernet e perfil rápido dos NOVUS são preservados.
+Firmware 0.2.6-hmi-bench preparado para IHM mestre Modbus RTU, STM32 escravo endereço 1, 115200 baud, 8N1. PD1/TX e PD0/RX confirmados pelo usuário. O módulo RS485/TTL é separado do usado pelos NOVUS e tem direção automática. UART4 usa DMA1 Stream1; os NOVUS continuam em USART2/DMA1 Stream0. Ethernet e perfil rápido dos NOVUS são preservados.
 
 **Ainda não existe arquivo de projeto DOPSoft nem programa transferido à IHM.** DOPSoft 4.00.16 instalado pelo usuário e aberto nesta etapa; projeto nativo ainda em montagem. A porta COM/DB9 física aguarda confirmação. Estes arquivos são uma arte final de fundo e uma especificação objetiva dos objetos nativos para montar o projeto; não substituem um .dop compilado. Não houve validação da UART4 ou da tela na IHM física.
 

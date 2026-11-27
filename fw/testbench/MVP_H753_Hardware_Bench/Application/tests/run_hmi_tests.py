@@ -75,10 +75,12 @@ int main(void){
 with tempfile.TemporaryDirectory(prefix='hmi-tests-') as td:
  d=Path(td);(d/'hmi_uart.h').write_text(stub);(d/'test.c').write_text(harness)
  (d/'hmi_service.c').write_text((root/'Application/hmi_service.c').read_text())
+ (d/'pinout.h').write_text((root/'Application/board/pinout.h').read_text().replace('#include "stm32h7xx_hal.h"',''))
  exe=d/'test.exe'
  subprocess.run(['gcc','-std=c11','-Wall','-Wextra','-Werror','-I'+str(d),'-I'+str(root/'Application'),
   str(d/'test.c'),str(d/'hmi_service.c'),str(root/'Application/modbus_slave.c'),str(root/'Application/modbus_read.c'),'-o',str(exe)],check=True)
  result=json.loads(subprocess.check_output([str(exe)],text=True))
  assert result['readonly'] is True and result['address']==1 and result['baud']==115200
+ assert result['tx_pin']=='PD1' and result['rx_pin']=='PD0'
  assert result['requests']==4 and result['responses']==3 and result['tx_failures']==1
  print('PASS: real HMI map/service and Modbus slave: signed values, validity, age, FC03/04, full map, CRC, bounds, silent broadcast, rejected writes, echoes and bounded JSON')

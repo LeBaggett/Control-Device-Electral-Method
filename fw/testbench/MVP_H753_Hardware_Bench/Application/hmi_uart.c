@@ -30,16 +30,16 @@ static int arm_rx(void){
 }
 void hmi_uart_init(uint32_t now){
  GPIO_InitTypeDef gpio={0};RCC_PeriphCLKInitTypeDef clock={0};
- __HAL_RCC_GPIOC_CLK_ENABLE();direction(0);
+ BENCH_HMI_GPIO_CLOCK_ENABLE();direction(0);
 
  gpio.Pin=BENCH_HMI_TX_PIN;gpio.Mode=GPIO_MODE_AF_PP;
  gpio.Alternate=GPIO_AF8_UART4;gpio.Pull=GPIO_PULLUP;gpio.Speed=GPIO_SPEED_FREQ_HIGH;
- HAL_GPIO_Init(GPIOC,&gpio);
- /* PC11 is FT_h. Disable internal pulls for an externally driven RX level
-  * above VDD. STM32 must be powered; never drive another output into PC10.
+ HAL_GPIO_Init(BENCH_HMI_PORT,&gpio);
+ /* PD0 is FT_h. Disable internal pulls for an externally driven RX level
+  * above VDD. STM32 must be powered; never drive another output into PD1.
   * If a manual transceiver leaves RO floating while disabled, provide an
   * appropriate external idle bias rather than enabling an internal pull. */
- gpio.Pin=BENCH_HMI_RX_PIN;gpio.Pull=GPIO_NOPULL;HAL_GPIO_Init(GPIOC,&gpio);
+ gpio.Pin=BENCH_HMI_RX_PIN;gpio.Pull=GPIO_NOPULL;HAL_GPIO_Init(BENCH_HMI_PORT,&gpio);
  clock.PeriphClockSelection=RCC_PERIPHCLK_UART4;clock.Usart234578ClockSelection=RCC_USART234578CLKSOURCE_D2PCLK1;
  if(HAL_RCCEx_PeriphCLKConfig(&clock)!=HAL_OK){g_hmi_uart_debug.init_status=10;return;}
  __HAL_RCC_UART4_CLK_ENABLE();__HAL_RCC_DMA1_CLK_ENABLE();

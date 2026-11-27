@@ -1,6 +1,6 @@
 #ifndef BENCH_CONFIG_H
 #define BENCH_CONFIG_H
-#define BENCH_VERSION "0.2.6-hmi-bench"
+#define BENCH_VERSION "0.2.7-hmi-pd01"
 /* N1040i menu must match. Parity: 0 none, 1 even, 2 odd (8 data + 1 stop). */
 #define BENCH_N1040_ENABLED 1
 /* Separate IHM bus: Delta master -> STM slave, read-only bench map. */

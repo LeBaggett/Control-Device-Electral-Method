@@ -1,6 +1,10 @@
+> Atualização 2026-11-27: ligação física corrigida pelo usuário para PD0/RX e PD1/TX. Firmware 0.2.7-hmi-pd01 usa GPIOD/AF8 e diagnóstico com os mesmos nomes do pinout.h. O mapeamento anterior PC10/PC11 também existe no MCU, mas não correspondia aos fios instalados. UART4/DMA1 Stream1, endereço 1 e 115200/8N1 preservados. Recompilar e gravar; conferir /api/hmi: tx_pin=PD1 e rx_pin=PD0. Não houve validação física por software nesta entrega.
+>
+> Referência: https://www.st.com/resource/en/datasheet/stm32h753zi.pdf (funções alternativas PD0/PD1).
+
 # Integração UART4 — bancada 0.2.6-hmi-bench
 
-PC10/TX e PC11/RX foram confirmados pelo usuário. O firmware em fw/testbench/MVP_H753_Hardware_Bench implementa UART4, DMA1 Stream1 circular e escravo Modbus RTU endereço 1, 115200 baud, 8N1. A IHM Delta é mestre e o conversor tem direção automática, sem GPIO DE/RE. Os NOVUS permanecem em USART2/DMA1 Stream0, endereços 247/246/245 e perfil rápido validado pelo usuário.
+PD1/TX e PD0/RX foram confirmados pelo usuário. O firmware em fw/testbench/MVP_H753_Hardware_Bench implementa UART4, DMA1 Stream1 circular e escravo Modbus RTU endereço 1, 115200 baud, 8N1. A IHM Delta é mestre e o conversor tem direção automática, sem GPIO DE/RE. Os NOVUS permanecem em USART2/DMA1 Stream0, endereços 247/246/245 e perfil rápido validado pelo usuário.
 
 O mapa de 64 palavras e a especificação dos objetos estão em [screens/bench](screens/bench/README.md). FC03 e FC04 leem o mapa; escritas são rejeitadas. Offset 0 = 0xCA15; offset 3 = heartbeat em segundos; temperaturas assinadas em décimos nos offsets 11/21/31, validade em 12/22/32 e unidade em 19/29/39. Consultar o CSV para o mapa completo e conversão 40001/offset 0.
 

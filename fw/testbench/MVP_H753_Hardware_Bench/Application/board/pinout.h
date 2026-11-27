@@ -21,8 +21,13 @@
 #define BENCH_RS485_RX_PIN GPIO_PIN_6
 #define BENCH_RS485_DIR_PORT GPIOD
 #define BENCH_RS485_DIR_PIN GPIO_PIN_4
-/* Dedicated UART4 bus for the IHM, PC10/PC11 confirmed by user. */
-#define BENCH_HMI_TX_PIN GPIO_PIN_10
-#define BENCH_HMI_RX_PIN GPIO_PIN_11
+/* Actual IHM wiring confirmed 2026-11-27: PD1=TX, PD0=RX, AF8.
+ * Keep port, clock and diagnostic names together when remapping. */
+#define BENCH_HMI_PORT GPIOD
+#define BENCH_HMI_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOD_CLK_ENABLE()
+#define BENCH_HMI_TX_PIN GPIO_PIN_1
+#define BENCH_HMI_RX_PIN GPIO_PIN_0
+#define BENCH_HMI_TX_NAME "PD1"
+#define BENCH_HMI_RX_NAME "PD0"
 /* No relay, SELECT, DAC, heater or DUT source pins are configured here. */
 #endif

@@ -2,6 +2,7 @@
 #include "hmi_uart.h"
 #include "modbus_slave.h"
 #include "bench_config.h"
+#include "pinout.h"
 #include "bench_diag.h"
 #include "n1040.h"
 #include <stdio.h>
@@ -11,7 +12,7 @@ static uint16_t registers[HMI_REGISTER_COUNT];
 static uint16_t saturated_age(unsigned seen,uint32_t age){return !seen || age>65535U?65535U:(uint16_t)age;}
 void hmi_register_snapshot(uint16_t r[HMI_REGISTER_COUNT],uint32_t now){
  memset(r,0,HMI_REGISTER_COUNT*sizeof(*r));
- r[0]=0xca15;r[1]=1;r[2]=0x0206;r[3]=(uint16_t)(now/1000U);
+ r[0]=0xca15;r[1]=1;r[2]=0x0207;r[3]=(uint16_t)(now/1000U);
  r[4]=(uint16_t)(g_bench_debug.link_up?1U:0U);r[4]|=0x0300U; /* Power blocked, read-only bench. */
  r[5]=(uint16_t)g_n1040_debug.count;r[7]=(uint16_t)g_rs485_debug.uart_errors;
  r[8]=(uint16_t)g_hmi_debug.requests;r[9]=(uint16_t)g_bench_debug.boot_stage;
@@ -49,8 +50,8 @@ void hmi_step(uint32_t now){
 }
 int hmi_json(char *out,size_t capacity){
  if(!out || !capacity)return -1;
- int n=snprintf(out,capacity,"{\"enabled\":%u,\"uart\":\"UART4\",\"tx_pin\":\"PC10\",\"rx_pin\":\"PC11\",\"baud\":%u,\"address\":%u,\"parity\":%u,\"readonly\":true,\"map_version\":1,\"init_status\":%lu,\"requests\":%lu,\"responses\":%lu,\"exceptions\":%lu,\"crc_errors\":%lu,\"bad_frames\":%lu,\"ignored\":%lu,\"tx_failures\":%lu,\"last_request_ms\":%lu,\"rx_bytes\":%lu,\"uart_error\":%lu,\"uart_errors\":%lu,\"restarts\":%lu,\"tx_timeouts\":%lu}",
- BENCH_HMI_ENABLED,BENCH_HMI_BAUD,BENCH_HMI_ADDRESS,BENCH_HMI_PARITY,
+ int n=snprintf(out,capacity,"{\"enabled\":%u,\"uart\":\"UART4\",\"tx_pin\":\"%s\",\"rx_pin\":\"%s\",\"baud\":%u,\"address\":%u,\"parity\":%u,\"readonly\":true,\"map_version\":1,\"init_status\":%lu,\"requests\":%lu,\"responses\":%lu,\"exceptions\":%lu,\"crc_errors\":%lu,\"bad_frames\":%lu,\"ignored\":%lu,\"tx_failures\":%lu,\"last_request_ms\":%lu,\"rx_bytes\":%lu,\"uart_error\":%lu,\"uart_errors\":%lu,\"restarts\":%lu,\"tx_timeouts\":%lu}",
+ BENCH_HMI_ENABLED,BENCH_HMI_TX_NAME,BENCH_HMI_RX_NAME,BENCH_HMI_BAUD,BENCH_HMI_ADDRESS,BENCH_HMI_PARITY,
  (unsigned long)g_hmi_uart_debug.init_status,(unsigned long)g_hmi_debug.requests,
  (unsigned long)g_hmi_debug.responses,(unsigned long)g_hmi_debug.exceptions,
  (unsigned long)g_hmi_debug.crc_errors,(unsigned long)g_hmi_debug.bad_frames,

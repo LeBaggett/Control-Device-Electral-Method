@@ -12,7 +12,7 @@ Para voltar ao ritmo anterior, definir `BENCH_N1040_FAST_POLL = 0` em `Applicati
 
 ## IHM UART4 — primeira bancada
 
-Versão 0.2.6-hmi-bench: UART4 em PC10/PC11, DMA1 Stream1, escravo Modbus RTU endereço 1 / 115200 / 8N1, mapa somente leitura de 64 palavras. `/api/hmi` e `g_hmi_debug` permitem acompanhar a comunicação. O endereço 1 pertence ao STM no canal dedicado da IHM; os NOVUS 247/246/245 continuam no USART2.
+Versão 0.2.6-hmi-bench: UART4 em PD1/PD0, DMA1 Stream1, escravo Modbus RTU endereço 1 / 115200 / 8N1, mapa somente leitura de 64 palavras. `/api/hmi` e `g_hmi_debug` permitem acompanhar a comunicação. O endereço 1 pertence ao STM no canal dedicado da IHM; os NOVUS 247/246/245 continuam no USART2.
 
 A tela de fundo e a especificação dos objetos ficam em hmi/mvp/screens/bench/. Ainda não há projeto DOPSoft compilado nem transferência física. Instalação do editor e montagem do projeto nativo pendentes.
 
