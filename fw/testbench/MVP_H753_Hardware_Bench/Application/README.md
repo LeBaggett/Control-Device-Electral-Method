@@ -15,3 +15,7 @@
 | tests/ | Testes de HTTP e protocolo/estados no computador |
 
 Consulte ../INTEGRACAO_N1040I.md. Nenhum driver de potÃªncia Ã© incluÃ­do.
+
+## ADC + DMA
+
+`adc_service.c/.h` integra ADC1, TIM6 e DMA circular; `adc_stats.c/.h` calcula estatísticas e tensão nominal por bloco. Detalhes, limites e mapa da IHM em [README_ADC.md](README_ADC.md).

@@ -6,3 +6,4 @@
 Executar ambos na raiz da bancada, com Python 3, GCC host e Node disponíveis. Eles não validam eletricamente a UART, o DMA real, a direção RS485, o termopar ou a Ethernet física. Consulte o roteiro em ../../INTEGRACAO_N1040I.md.
 
 - `run_hmi_tests.py`: testa o mapa/serviço/servidor Modbus reais com transporte simulado, FC03/04, faixa, CRC, broadcasts, escritas rejeitadas, temperaturas assinadas, validade e JSON limitado.
+`run_adc_tests.py`: escala nominal, extremos e overflow das estatísticas ADC, sem validar hardware.

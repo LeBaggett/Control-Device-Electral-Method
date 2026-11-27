@@ -1,5 +1,10 @@
 #include "main.h"
 #include "bench_diag.h"
+#include "adc_service.h"
+extern ADC_HandleTypeDef g_adc_handle;
+extern DMA_HandleTypeDef g_adc_dma;
+void DMA1_Stream2_IRQHandler(void){HAL_DMA_IRQHandler(&g_adc_dma);}
+void ADC_IRQHandler(void){HAL_ADC_IRQHandler(&g_adc_handle);}
 extern ETH_HandleTypeDef EthHandle;
 extern UART_HandleTypeDef g_rs485_uart;
 extern UART_HandleTypeDef g_hmi_uart;

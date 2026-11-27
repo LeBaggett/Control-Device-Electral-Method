@@ -1,6 +1,16 @@
 #ifndef BENCH_CONFIG_H
 #define BENCH_CONFIG_H
-#define BENCH_VERSION "0.2.8-hmi-9600"
+#define BENCH_VERSION "0.3.0-adc-dma"
+/* Input-pin voltage only; nominal VDDA, not an external reference or DUT gain. */
+#define BENCH_ADC_REFERENCE_MV 3300U
+#define BENCH_ADC_SAMPLE_HZ 1000U
+#define BENCH_ADC_STALE_MS 250U
+#if BENCH_ADC_REFERENCE_MV < 1800U || BENCH_ADC_REFERENCE_MV > 3600U
+#error "Invalid nominal analog reference"
+#endif
+#if BENCH_ADC_SAMPLE_HZ < 100U || BENCH_ADC_SAMPLE_HZ > 10000U || (1000000U % BENCH_ADC_SAMPLE_HZ) != 0
+#error "ADC sample rate must divide 1 MHz and be 100..10000 Hz"
+#endif
 /* N1040i menu must match. Parity: 0 none, 1 even, 2 odd (8 data + 1 stop). */
 #define BENCH_N1040_ENABLED 1
 /* Separate IHM bus: Delta master -> STM slave, read-only bench map. */

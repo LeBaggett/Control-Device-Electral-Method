@@ -1,7 +1,7 @@
 ﻿offset_decimal,reference_4xxxx,name,type,scale,access,meaning
 0,40001,signature,uint16,hex,read,0xCA15; usar para confirmar base de endereçamento
-1,40002,map_version,uint16,1,read,Versão 1 do contrato
-2,40003,firmware_minor_patch,uint16,hex,read,0x0208 para versão 0.2.8
+1,40002,map_version,uint16,1,read,Versão 2 do contrato; extensão ADC aditiva
+2,40003,firmware_minor_patch,uint16,hex,read,0x0300 para versão 0.3.0
 3,40004,uptime_seconds,uint16,1 s,read,Heartbeat; contador de segundos módulo 65536
 4,40005,status_bits,uint16,bits,read,bit0 link Ethernet; bits1..3 canais válidos; bit8 sem driver de potência; bit9 somente leitura
 5,40006,configured_channels,uint16,1,read,Quantidade configurada de NOVUS
@@ -46,20 +46,20 @@
 44,40045,ethernet_link_changes,uint16,1,read,Contador módulo 65536
 45,40046,fatal_code,uint16,1,read,Último código de falha fatal no boot atual
 46,40047,ethernet_link,uint16,0/1,read,Link físico; não equivale a sessão TCP nem serial da IHM
-47,40048,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-48,40049,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-49,40050,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-50,40051,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-51,40052,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-52,40053,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-53,40054,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-54,40055,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-55,40056,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-56,40057,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-57,40058,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-58,40059,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-59,40060,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-60,40061,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-61,40062,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-62,40063,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
-63,40064,reserved,uint16,1,read,"Reservado; retorna zero, não representa medição implementada"
+47,40048,adc_valid,uint16,1,read,Bloco recente sem falha; não confirma DUT conectado
+48,40049,adc_mean_raw,uint16,counts,read,Média bruta 16 bits
+49,40050,adc_min_raw,uint16,counts,read,Mínimo do bloco
+50,40051,adc_max_raw,uint16,counts,read,Máximo do bloco
+51,40052,adc_input_mv,uint16,mV,read,Tensão PA6; referência nominal
+52,40053,adc_sample_hz,uint16,Hz,read,Taxa configurada
+53,40054,adc_blocks_low,uint16,1,read,16 bits inferiores do contador
+54,40055,adc_error_low,uint16,hex,read,Máscara HAL ADC; 16 bits inferiores
+55,40056,adc_phase,uint16,1,read,Fase; 7 aquisição; 8 falha
+56,40057,adc_reference_mv,uint16,mV,read,Referência nominal
+57,40058,adc_skipped_low,uint16,1,read,Blocos não processados; 16 bits inferiores
+58,40059,reserved,uint16,1,read,Reservado; zero
+59,40060,reserved,uint16,1,read,Reservado; zero
+60,40061,reserved,uint16,1,read,Reservado; zero
+61,40062,reserved,uint16,1,read,Reservado; zero
+62,40063,reserved,uint16,1,read,Reservado; zero
+63,40064,reserved,uint16,1,read,Reservado; zero

@@ -20,6 +20,7 @@ with tempfile.TemporaryDirectory(prefix='h753-tests-') as tmp:
 #include <stdio.h>
 #include <string.h>
 int n1040_json(char *out,size_t cap){return snprintf(out,cap,"{}");}
+int adc_json(char *out,size_t cap){return snprintf(out,cap,"{}");}
 int hmi_json(char *out,size_t cap){return snprintf(out,cap,"{}");}
 static unsigned allocated,fail_alloc;
 void *mem_malloc(size_t n){if(fail_alloc)return NULL;void*p=malloc(n);if(p)allocated++;return p;}
@@ -45,6 +46,7 @@ int main(void){
  const char *length=strstr(b.data,"Content-Length: ");assert(length);
  assert((size_t)atoi(length+16)==strlen(body));
  puts(body);fs_close(&a);fs_close(&b);assert(allocated==0);
+ assert(fs_open(&a,"/api/adc")==0 && allocated==1);fs_close(&a);assert(allocated==0);
  fail_alloc=1;assert(fs_open(&a,"/api/status")==ERR_VAL);
  assert(g_bench_debug.http_alloc_failures==1 && allocated==0);
  return 0;

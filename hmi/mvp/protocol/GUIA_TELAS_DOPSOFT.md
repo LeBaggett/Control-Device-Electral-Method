@@ -1,7 +1,7 @@
 # Guia para desenvolver telas — Delta DOP-107BV
 
 Contrato de comunicação da bancada CAIS / NUCLEO-H753ZI. Revisão: 2026-11-27.
-Firmware de referência: **0.2.8-hmi-9600**, mapa versão **1**, commit **c2c708e**.
+Firmware de referência: **0.3.0-adc-dma**, mapa versão **2**.
 
 ## Objetivo e autonomia do responsável pelas telas
 
@@ -9,7 +9,7 @@ Este documento contém as informações necessárias para criar páginas, reorga
 
 Para adicionar uma página, o trabalho é feito somente no projeto da Delta: criar a tela, inserir os objetos, configurar os endereços publicados aqui, criar a navegação, compilar e transferir para a IHM. Não se cadastram números de tela, imagens, botões de navegação ou layouts no STM32. As artes podem ser fundos; as leituras e os botões precisam de objetos nativos do DOPSoft sobrepostos.
 
-A autonomia cobre os dados publicados no mapa versão 1. Não existem comandos de iniciar/parar calibração ou ensaio, ajustes de corrente, atuação de relé/aquecedor ou leituras de ADC/DAC nesta interface de bancada. Criar um desenho de botão não implementa essas funções. Um dado ou comando novo, fora deste contrato, deve ser combinado com o responsável pelo firmware antes de ser usado.
+A autonomia cobre os dados publicados no mapa versão 2. Não existem comandos de iniciar/parar calibração ou ensaio, ajustes de corrente, atuação de relé/aquecedor ou saídas DAC nesta interface de bancada. Criar um desenho de botão não implementa essas funções. Um dado ou comando novo, fora deste contrato, deve ser combinado com o responsável pelo firmware antes de ser usado.
 
 ## Estado verificado e escopo
 
@@ -125,8 +125,8 @@ O heartbeat W40004 deve avançar enquanto a comunicação estiver funcionando. N
 | Dado | Endereço | Apresentação |
 |---|---|---|
 | Assinatura do dispositivo | W40001 | Hexadecimal, esperado CA15 (51733 decimal) |
-| Versão do mapa | W40002 | Inteiro, esperado 1 |
-| Versão minor/patch do firmware | W40003 | Hexadecimal, 0208 nesta versão |
+| Versão do mapa | W40002 | Inteiro, esperado 2 |
+| Versão minor/patch do firmware | W40003 | Hexadecimal, 0300 nesta versão |
 | Tempo ligado / heartbeat | W40004 | Unsigned Decimal, 5 inteiros, 0 decimais |
 | Quantidade de NOVUS configurados | W40006 | Inteiro, atualmente 3 |
 | Quantidade de canais válidos | W40007 | Inteiro, 0…3 |
@@ -201,3 +201,7 @@ Mudanças apenas de apresentação não exigem alterar o mapa. Para um dado/coma
 - [Pinagem e instalação oficial DOP-107BV](https://filecenter.deltaww.com/Products/download/06/060302/Manual/DELTA_IA-HMI_DOP-107BV_TC-SC-EN-TUR_20191016.pdf).
 - [Endereçamento oficial Modbus 984 RTU/ASCII Master](https://filecenter.deltaww.com/Products/download/06/060302/Manual/DELTA_IA-HMI_Modbus%20984%20RTU-ASCII_Master_CM_EN_20130823.pdf).
 - Contrato conferido na implementação atual e no mapa fornecido com esta revisão. A especificação do firmware prevalece para versões diferentes desta referência.
+
+## Extensão ADC — firmware 0.3.0, mapa 2
+
+Os endereços anteriores foram preservados. W40048…W40058 agora publicam ADC; somente offsets 58…63 continuam reservados. A especificação atual está em [README_ADC.md](../../../fw/testbench/MVP_H753_Hardware_Bench/Application/README_ADC.md) e no [CSV do mapa](../screens/bench/holding-registers.csv). Usar W40048 como condição de validade para W40052 (mV, dividir por 1000 para V). A leitura é tensão no pino PA6 com referência nominal, ainda sem validação elétrica. Não foi alterado o projeto nativo DOPSoft.

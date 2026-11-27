@@ -29,5 +29,11 @@
 #define BENCH_HMI_RX_PIN GPIO_PIN_0
 #define BENCH_HMI_TX_NAME "PD1"
 #define BENCH_HMI_RX_NAME "PD0"
+/* ADC1 positive input 3, single-ended: PA6. No front-end gain assumed. */
+#define BENCH_ADC_PORT GPIOA
+#define BENCH_ADC_PIN GPIO_PIN_6
+#define BENCH_ADC_CHANNEL ADC_CHANNEL_3
+#define BENCH_ADC_PIN_NAME "PA6"
+#define BENCH_ADC_GPIO_CLOCK_ENABLE() __HAL_RCC_GPIOA_CLK_ENABLE()
 /* No relay, SELECT, DAC, heater or DUT source pins are configured here. */
 #endif

@@ -9,6 +9,7 @@ size_t hmi_uart_take_frame(uint8_t *data,size_t capacity);
 '''
 harness=r'''
 #include "hmi_service.h"
+#include "adc_service.h"
 #include "hmi_uart.h"
 #include "bench_config.h"
 #include "bench_diag.h"
@@ -18,6 +19,7 @@ harness=r'''
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
+volatile adc_debug_t g_adc_debug;
 volatile bench_diag_t g_bench_debug;
 volatile n1040_debug_t g_n1040_debug;
 volatile rs485_debug_t g_rs485_debug,g_hmi_uart_debug;
@@ -38,8 +40,10 @@ int main(void){
   g_n1040_debug.node[i].online=i<2;g_n1040_debug.node[i].pv_seen=i<2;
   g_n1040_debug.node[i].pv_tenths=i==1?-55:266;g_n1040_debug.node[i].last_pv_ms=990;
  }
+ g_adc_debug.valid=1;g_adc_debug.mean_raw=65535;g_adc_debug.millivolts=3300;
  uint16_t r[64];hmi_register_snapshot(r,1000);
- assert(r[0]==0xca15 && r[1]==1 && r[4]==0x0307 && r[5]==3 && r[6]==2);
+ assert(r[0]==0xca15 && r[1]==2 && r[4]==0x0307 && r[5]==3 && r[6]==2);
+ assert(r[47]==1 && r[48]==65535 && r[51]==3300 && r[52]==1000);
  assert(r[10]==247 && r[11]==266 && r[12]==1 && r[16]==10);
  assert(r[20]==246 && mb_signed_word(r[21])==-55);
  assert(r[30]==245 && r[32]==0 && r[36]==65535);

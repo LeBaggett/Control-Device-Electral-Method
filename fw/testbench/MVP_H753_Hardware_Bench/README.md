@@ -1,4 +1,6 @@
-# Testbench MVP H753 - etapa 2: Ethernet + N1040i / RS485
+# Testbench MVP H753 � Ethernet, NOVUS, IHM e ADC + DMA
+
+Vers�o atual **0.3.0-adc-dma**. Primeiro passo de aquisi��o em PA6, 16 bits, TIM6 a 1 kS/s e DMA1 Stream2. Leia [Application/README_ADC.md](Application/README_ADC.md) para estrat�gia, par�metros, diagn�sticos e novos registradores da IHM (mapa 2). ADC ainda sem valida��o f�sica. A comunica��o dos tr�s NOVUS e da IHM foi confirmada pelo usu�rio nas etapas anteriores; esta extens�o precisa de valida��o integrada posterior.
 
 Projeto para **NUCLEO-H753ZI / MB1364**, sem RTOS. Esta entrega contém fontes, HAL/CMSIS/LwIP/PHY com versões fixadas e metadados de projeto CubeIDE. **Acesso HTTP da etapa anterior confirmado pelo usuário na placa após corrigir o callback de cache Ethernet. Na versão 0.2.3-n1040i, comunicação e leitura real de um N1040i em paralelo à Ethernet foram confirmadas pelo usuário em 2026-11-17, após substituir jumpers defeituosos. Testes prolongados e três indicadores ainda pendentes.**
 
@@ -27,7 +29,7 @@ A tela de fundo e a especificação dos objetos ficam em hmi/mvp/screens/bench/.
 - Página de diagnóstico e endpoint somente leitura **`GET /api/status`**.
 - Diagnósticos em **`g_bench_debug`**, inclusive erros HAL/DMA e mudança de link.
 
-RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, três indicadores ativos em 247, 246 e 245, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. O transporte/mapa UART4 da IHM está implementado para teste; o projeto nativo da tela ainda está pendente. ADC/timer do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
+RS485 implementado em leitura: USART2 PD5/PD6, direção automática por padrão (PD4 apenas no modo manual), RX DMA circular e função Modbus 03, endereços decrescentes 247/246/245, três indicadores ativos em 247, 246 e 245, 115200 baud/8N1. Diagnósticos em `/api/n1040`, `g_n1040_debug` e `g_rs485_debug`. O transporte/mapa UART4 da IHM está implementado para teste; o projeto nativo da tela ainda está pendente. O ADC de diagn�stico est� implementado; captura sincronizada do TSP, fonte, relé/SELECT e aquecedor **não estão implementados nesta etapa**. Para este teste use NUCLEO + transceptor + N1040i, sem DUT/estágio de potência conectado. A ausência de comandos não equivale a uma inibição elétrica de um circuito externo.
 
 ## Estratégia e motivos
 

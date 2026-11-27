@@ -28,8 +28,11 @@ updateN1040();
 
 async function updateHmi(){const controller=new AbortController();const timer=setTimeout(()=>controller.abort(),2500);try{
  const response=await fetch('/api/hmi',{cache:'no-store',signal:controller.signal});if(!response.ok)throw Error(response.status);const d=await response.json();
- el('hmistate').textContent=!d.enabled?'UART4 desabilitada':d.init_status?'Falha de inicializacao UART4: '+d.init_status:'PC10 TX / PC11 RX / '+d.baud+' / endereco STM '+d.address+' / '+d.requests+' pedidos / '+d.responses+' respostas. '+(d.requests?'Acompanhe heartbeat e erros para confirmar continuidade.':'Aguardando consultas da IHM: configurar mestre Modbus RTU e mapa no DOPSoft.');
+ el('hmistate').textContent=!d.enabled?'UART4 desabilitada':d.init_status?'Falha de inicializacao UART4: '+d.init_status:'PD1 TX / PD0 RX / '+d.baud+' / endereco STM '+d.address+' / '+d.requests+' pedidos / '+d.responses+' respostas. '+(d.requests?'Acompanhe heartbeat e erros para confirmar continuidade.':'Aguardando consultas da IHM: configurar mestre Modbus RTU e mapa no DOPSoft.');
  el('hmiraw').textContent=JSON.stringify(d,null,2);
  }catch(error){el('hmistate').textContent='Diagnostico da IHM indisponivel; dados antigos.';}
  finally{clearTimeout(timer);setTimeout(updateHmi,1000);}}updateHmi();
+</script><section><h2>ADC / DMA - entrada PA6</h2><p>Tensao no pino, referencia nominal. Entrada desconectada pode flutuar.</p><pre id="adcraw">Aguardando ADC.</pre></section>
+<script>
+async function pollAdc(){try{const r=await fetch('/api/adc',{cache:'no-store',signal:AbortSignal.timeout(2000)});if(!r.ok)throw Error(r.status);document.getElementById('adcraw').textContent=JSON.stringify(await r.json(),null,2);}catch(e){document.getElementById('adcraw').textContent='ADC indisponivel; nao usar dados anteriores.';}finally{setTimeout(pollAdc,500);}}pollAdc();
 </script></html>
